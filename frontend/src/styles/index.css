@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --color-beatly-bg: #090909;
+  --color-beatly-surface: #111111;
+  --color-beatly-card: #181818;
+  --color-beatly-primary: #1ED760;
+  --color-beatly-text-sec: #B3B3B3;
+  --color-beatly-error: #EF4444;
+  --color-beatly-success: #22C55E;
+  --color-beatly-warning: #FACC15;
+
+  --font-manrope: "Manrope", sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-beatly-bg text-white font-manrope antialiased;
+  }
+}

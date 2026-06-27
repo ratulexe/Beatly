@@ -1,0 +1,1 @@
+export const StatCard = ({ title, value }) => <div className="bg-beatly-card p-4 rounded-xl"><h3 className="text-beatly-text-sec text-sm">{title}</h3><p className="text-2xl font-bold">{value}</p></div>;
