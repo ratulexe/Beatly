@@ -1,30 +1,77 @@
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const session = require('express-session');
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import morgan from 'morgan';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import hpp from 'hpp';
+import rateLimit from 'express-rate-limit';
+
+import { env } from './config/env.js';
+import logger from './config/logger.js';
+import routes from './routes/index.js';
+import notFound from './middlewares/notFound.js';
+import errorHandler from './middlewares/errorHandler.js';
 
 const app = express();
 
+// Security Middlewares
 app.use(helmet());
-app.use(cors());
-app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret',
-  resave: false,
-  saveUninitialized: false
+app.disable('x-powered-by');
+
+// CORS Configuration
+app.use(cors({
+  origin: env.CLIENT_URL,
+  credentials: true
 }));
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Beatly API Running' });
+// Rate Limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    success: false,
+    message: 'Too many requests from this IP, please try again after 15 minutes'
+  }
 });
+app.use(limiter);
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'healthy' });
-});
+// Parse bodies & prevent HTTP Parameter Pollution
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(hpp());
+app.use(cookieParser());
 
-module.exports = app;
+// Session
+app.use(session({
+  secret: env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: env.NODE_ENV === 'production',
+    httpOnly: true,
+    sameSite: 'strict'
+  }
+}));
+
+// Compression
+app.use(compression());
+
+// Logger
+if (env.NODE_ENV === 'development') {
+  app.use(morgan('dev', {
+    stream: { write: message => logger.info(message.trim()) }
+  }));
+}
+
+// Routes
+app.use('/', routes);
+
+// 404 Handler
+app.use(notFound);
+
+// Global Error Handler
+app.use(errorHandler);
+
+export default app;

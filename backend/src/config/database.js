@@ -1,15 +1,17 @@
-const mongoose = require('mongoose');
-require('dotenv').config();
+import mongoose from 'mongoose';
+import { env } from './env.js';
+import logger from './logger.js';
 
-const connectDB = async () => {
+mongoose.set('strictQuery', true);
+
+const connectDatabase = async () => {
   try {
-    const uri = process.env.MONGO_URI || 'mongodb://localhost:27017/beatly';
-    await mongoose.connect(uri);
-    console.log('MongoDB connected successfully');
+    const conn = await mongoose.connect(env.MONGODB_URI);
+    logger.info(`MongoDB connected: ${conn.connection.host}`);
   } catch (error) {
-    console.error('MongoDB connection error:', error);
+    logger.error('MongoDB connection error:', error.message);
     process.exit(1);
   }
 };
 
-module.exports = connectDB;
+export default connectDatabase;

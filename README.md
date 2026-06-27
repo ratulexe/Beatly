@@ -38,3 +38,25 @@ MIT
 
 ## Contributing
 Contributions are welcome.
+
+## Backend Environment Variables
+Create a \`.env\` file in the \`backend/\` directory with:
+\`\`\`env
+PORT=5000
+NODE_ENV=development
+MONGODB_URI=mongodb://localhost:27017/beatly
+SESSION_SECRET=your_super_secret_session_key
+CLIENT_URL=http://localhost:5173
+\`\`\`
+
+## Backend Installation
+\`\`\`bash
+cd backend
+npm install
+\`\`\`
+
+## Running the Backend
+\`\`\`bash
+cd backend
+npm run dev
+\`\`\`
