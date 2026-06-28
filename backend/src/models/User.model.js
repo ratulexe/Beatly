@@ -9,6 +9,16 @@ const userSchema = new mongoose.Schema({
   followers: { type: Number, default: 0 },
   profileImage: { type: String },
   spotifyProfileUrl: { type: String },
+  explicitContent: { type: Boolean, default: false },
+  
+  spotify: {
+    accessToken: { type: String },
+    refreshToken: { type: String },
+    expiresAt: { type: Date },
+    scope: { type: String },
+    tokenType: { type: String, default: 'Bearer' }
+  },
+
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
   connectedAt: { type: Date, default: Date.now },
@@ -16,7 +26,15 @@ const userSchema = new mongoose.Schema({
 }, {
 
   timestamps: true,
-  toJSON: { virtuals: true, transform: (doc, ret) => { delete ret.__v; delete ret.id; return ret; } },
+  toJSON: { 
+    virtuals: true, 
+    transform: (doc, ret) => { 
+      delete ret.__v; 
+      delete ret._id; 
+      delete ret.spotify; // NEVER expose tokens
+      return ret; 
+    } 
+  },
   toObject: { virtuals: true }
 
 });

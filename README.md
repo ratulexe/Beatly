@@ -88,7 +88,6 @@ Beatly uses a scalable MongoDB architecture via Mongoose with the following mode
 - **ListeningHistory**: Logs each stream (which user played which track, when, and on what device).
 
 ### Relationships
-- `User` 1:1 `SpotifyToken`
 - `User` 1:N `ListeningHistory`
 - `ListeningHistory` N:1 `Track`
 - `Track` N:1 `Album`
@@ -100,8 +99,34 @@ Beatly uses a scalable MongoDB architecture via Mongoose with the following mode
 ### Key Indexes
 To ensure fast analytics aggregation, the following indexes are configured:
 - `User`: `spotifyId` (unique), `email` (unique)
-- `SpotifyToken`: `userId`, `expiresAt`
 - `Artist`: `spotifyArtistId` (unique), `name`
 - `Album`: `spotifyAlbumId` (unique)
 - `Track`: `spotifyTrackId` (unique), `durationMs`
 - `ListeningHistory`: `userId`, `trackId`, `playedAt`, and a **compound index** on `{ userId: 1, playedAt: -1 }` for fast chronological lookups.
+
+## User Profile Synchronization (Phase 5)
+
+Beatly integrates seamlessly with Spotify's OAuth flow to synchronize user profiles in real-time.
+
+### Authentication Flow
+1. User clicks "Continue with Spotify".
+2. Directed to Spotify OAuth authorization screen.
+3. Upon approval, redirected back to `http://localhost:5000/api/auth/callback`.
+4. Backend exchanges authorization code for an **Access Token** and **Refresh Token**.
+5. Backend fetches the user's latest Spotify profile.
+6. The profile and authentication tokens are securely upserted into the MongoDB `User` document.
+7. Only the MongoDB `userId` is stored in the Express session to keep the session lightweight and secure.
+8. The user is redirected to the `/profile` frontend route.
+
+### Database Strategy
+- **Embedded Tokens:** Instead of a separate token collection, Spotify authentication credentials (`accessToken`, `refreshToken`, `expiresAt`) are embedded within the `User` model inside a `spotify` subdocument. 
+- **Security:** The Mongoose `toJSON` transform explicitly strips the `spotify` object, guaranteeing tokens are never leaked to the frontend.
+
+### Protected Routes
+- All `/api/user/*` routes are protected by the `authenticate.js` middleware.
+- The middleware verifies the `req.session.userId` exists and matches a valid user in the database, returning `401 Unauthorized` otherwise.
+
+### Spotify Client & Automatic Refresh
+Beatly uses a custom Axios client (`spotifyClient.js`) for all future Spotify Web API interactions.
+- Automatically attaches the user's current `accessToken`.
+- **Automatic Token Refresh:** Intercepts `401 Unauthorized` responses. If a token is expired, it uses the `refreshToken` to acquire a new one, silently updates the MongoDB `User` document, and retries the original request transparently without interrupting the user's flow.
