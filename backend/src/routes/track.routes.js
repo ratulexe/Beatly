@@ -9,5 +9,6 @@ router.use(spotifyAuth);
 
 router.patch('/sync', trackController.syncTracks);
 router.get('/recent', trackController.getRecentTracks);
+router.get('/now-playing', trackController.getNowPlaying);
 
 export default router;

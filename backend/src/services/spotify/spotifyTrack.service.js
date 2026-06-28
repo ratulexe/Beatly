@@ -7,8 +7,8 @@ export const getRecentlyPlayed = async (user, limit = 50, after = null, before =
   if (after) params.after = after;
   if (before) params.before = before;
 
-  const response = await spotifyClient.get(user, SPOTIFY_ENDPOINTS.RECENTLY_PLAYED, { params });
-  return response.data;
+  const data = await spotifyClient.get(user, SPOTIFY_ENDPOINTS.RECENTLY_PLAYED, { params });
+  return data;
 };
 
 export const syncRecentlyPlayed = async (user) => {
@@ -70,6 +70,41 @@ export const syncRecentlyPlayed = async (user) => {
     albumsCreated,
     durationMs: Date.now() - startTime
   };
+};
+
+export const getCurrentlyPlaying = async (user) => {
+  try {
+    const data = await spotifyClient.get(user, SPOTIFY_ENDPOINTS.CURRENTLY_PLAYING);
+    
+    // Spotify returns 204 No Content when nothing is playing (spotifyClient returns undefined/null)
+    if (!data || !data.item) {
+      return null;
+    }
+
+    return {
+      isPlaying: data.is_playing,
+      track: {
+        name: data.item.name,
+        spotifyTrackId: data.item.id,
+        durationMs: data.item.duration_ms,
+        progressMs: data.progress_ms,
+        explicit: data.item.explicit,
+        spotifyUrl: data.item.external_urls?.spotify,
+        previewUrl: data.item.preview_url,
+        album: {
+          name: data.item.album?.name,
+          image: data.item.album?.images?.[0]?.url
+        },
+        artists: data.item.artists?.map(a => ({ name: a.name })) || []
+      }
+    };
+  } catch (error) {
+    // 204 or no content - nothing is playing
+    if (error.status === 204 || error.message?.includes('204')) {
+      return null;
+    }
+    throw error;
+  }
 };
 
 export const getTopTracks = async (user, limit = 20, timeRange = 'medium_term') => {

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useRecentTracks } from '../../hooks/useRecentTracks';
 import { useSyncTracks } from '../../hooks/useSyncTracks';
+import { useNowPlaying } from '../../hooks/useNowPlaying';
 import TrackFilters from '../../components/recentTracks/TrackFilters';
 import RecentTrackList from '../../components/recentTracks/RecentTrackList';
 import Pagination from '../../components/recentTracks/Pagination';
+import NowPlaying from '../../components/recentTracks/NowPlaying';
 
 const RecentTracks = () => {
   const [page, setPage] = useState(1);
@@ -11,6 +13,7 @@ const RecentTracks = () => {
 
   const { data: recentData, isLoading: isRecentLoading, isError, error } = useRecentTracks(page, limit);
   const syncMutation = useSyncTracks();
+  const { data: nowPlayingData } = useNowPlaying();
 
   const handleSync = () => {
     syncMutation.mutate(undefined, {
@@ -37,6 +40,8 @@ const RecentTracks = () => {
 
   return (
     <div style={styles.container}>
+      <NowPlaying data={nowPlayingData} />
+
       <TrackFilters 
         onSync={handleSync}
         isSyncing={syncMutation.isPending}

@@ -14,5 +14,10 @@ export const trackApi = {
   syncTracks: async () => {
     const response = await api.patch('/tracks/sync');
     return response.data;
+  },
+
+  getNowPlaying: async () => {
+    const response = await api.get('/tracks/now-playing');
+    return response.data;
   }
 };
