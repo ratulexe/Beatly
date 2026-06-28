@@ -23,7 +23,7 @@ export const ProfileStats = ({ profile }) => {
             <Crown size={24} />
           </div>
           <div>
-            <div className="text-2xl font-bold text-white capitalize">
+            <div className="text-xl sm:text-2xl font-bold text-white capitalize truncate max-w-[100px] sm:max-w-[120px]">
               {profile.product || 'Free'}
             </div>
           </div>

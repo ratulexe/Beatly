@@ -48,30 +48,30 @@ export const ProfileInfo = ({ profile, onSync, isSyncing, onLogout, isLoggingOut
 
         <div className="pt-4 space-y-3">
           <Link to="/recent">
-            <Button 
-              className="w-full bg-beatly-primary hover:bg-beatly-primary/80 text-white mb-3"
+            <button 
+              className="w-full bg-beatly-primary hover:bg-beatly-primary/90 text-black font-bold py-2.5 rounded-xl transition-colors mb-3"
             >
               View Recent Tracks
-            </Button>
+            </button>
           </Link>
 
-          <Button 
+          <button 
             onClick={onSync} 
             disabled={isSyncing || isLoggingOut}
-            className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 flex justify-center items-center gap-2"
+            className="w-full bg-beatly-surface-hover hover:bg-beatly-surface text-white font-bold py-2.5 rounded-xl transition-colors flex justify-center items-center gap-2 mb-3 disabled:opacity-50"
           >
             <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
-            {isSyncing ? 'Syncing with Spotify...' : 'Force Sync Profile'}
-          </Button>
+            {isSyncing ? 'Syncing...' : 'Force Sync Profile'}
+          </button>
 
-          <Button 
+          <button 
             onClick={onLogout} 
             disabled={isLoggingOut || isSyncing}
-            className="w-full bg-beatly-error/10 hover:bg-beatly-error/20 text-beatly-error border border-beatly-error/20 flex justify-center items-center gap-2"
+            className="w-full bg-beatly-error/10 hover:bg-beatly-error/20 text-beatly-error font-bold py-2.5 rounded-xl transition-colors flex justify-center items-center gap-2 disabled:opacity-50"
           >
             <LogOut size={18} className={isLoggingOut ? 'animate-pulse' : ''} />
             {isLoggingOut ? 'Logging out...' : 'Log Out'}
-          </Button>
+          </button>
         </div>
       </div>
     </ProfileCard>
