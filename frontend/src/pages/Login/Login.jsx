@@ -19,7 +19,7 @@ export default function Login() {
 
   const handleLogin = () => {
     setLoading(true);
-    window.location.href = 'http://localhost:5000/api/auth/login';
+    window.location.href = `http://127.0.0.1:5000/api/auth/login?t=${Date.now()}`;
   };
 
   return (

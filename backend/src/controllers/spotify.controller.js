@@ -5,6 +5,7 @@ export const login = (req, res) => {
   const state = spotifyAuthService.generateState();
   req.session.spotifyState = state;
   const authorizeUrl = spotifyAuthService.getAuthorizeUrl(state);
+  console.log('Redirecting to:', authorizeUrl);
   res.redirect(authorizeUrl);
 };
 
