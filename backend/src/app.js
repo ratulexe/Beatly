@@ -43,15 +43,22 @@ app.use(express.urlencoded({ extended: true }));
 app.use(hpp());
 app.use(cookieParser());
 
+import MongoStore from 'connect-mongo';
+
 // Session
 app.use(session({
   secret: env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: env.MONGODB_URI,
+    collectionName: 'sessions'
+  }),
   cookie: {
     secure: env.NODE_ENV === 'production',
     httpOnly: true,
-    sameSite: 'lax'
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
   }
 }));
 

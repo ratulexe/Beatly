@@ -2,6 +2,8 @@ import { Clock, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { ProfileCard } from './ProfileCard.jsx';
 import { Button } from '../ui/Button.jsx';
 
+import { Link } from 'react-router-dom';
+
 export const ProfileInfo = ({ profile, onSync, isSyncing, onLogout, isLoggingOut }) => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -45,6 +47,14 @@ export const ProfileInfo = ({ profile, onSync, isSyncing, onLogout, isLoggingOut
         </div>
 
         <div className="pt-4 space-y-3">
+          <Link to="/recent">
+            <Button 
+              className="w-full bg-beatly-primary hover:bg-beatly-primary/80 text-white mb-3"
+            >
+              View Recent Tracks
+            </Button>
+          </Link>
+
           <Button 
             onClick={onSync} 
             disabled={isSyncing || isLoggingOut}

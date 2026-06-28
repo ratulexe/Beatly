@@ -4,6 +4,7 @@ import Dashboard from '../pages/Dashboard/Dashboard';
 import Login from '../pages/Login/Login';
 import Profile from '../pages/Profile/Profile';
 import Settings from '../pages/Settings/Settings';
+import RecentTracks from '../pages/RecentTracks/RecentTracks';
 import NotFound from '../pages/NotFound/NotFound';
 
 const AppRoutes = () => {
@@ -13,6 +14,7 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/recent" element={<RecentTracks />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
