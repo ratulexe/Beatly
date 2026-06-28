@@ -57,3 +57,10 @@ export const respondToInvitation = async (invitationId, receiverId, status) => {
 
   return invitation;
 };
+
+export const getInvitations = async (userId) => {
+  return await Invitation.find({ receiver: userId, status: 'pending' })
+    .populate('sender', 'displayName profileImage spotifyId')
+    .populate('group', 'name coverImage')
+    .sort({ createdAt: -1 });
+};

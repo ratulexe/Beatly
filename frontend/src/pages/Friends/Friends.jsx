@@ -2,22 +2,20 @@ import React, { useState } from 'react';
 import { Search, UserPlus, Users } from 'lucide-react';
 import FriendCard from '../../components/friends/FriendCard';
 
-// Mock Data
-const MOCK_FRIENDS = [
-  { id: '1', name: 'Alice Smith', status: 'online' },
-  { id: '2', name: 'Bob Jones', status: 'offline' },
-  { id: '3', name: 'Charlie Brown', status: 'online' },
-  { id: '4', name: 'Diana Prince', status: 'offline' },
-  { id: '5', name: 'Eve Adams', status: 'online' },
-];
+import { useFriends } from '../../hooks/useFriends';
 
 const Friends = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filter, setFilter] = useState('all'); // all, online
+  const { friends, loading, error } = useFriends();
 
-  const filteredFriends = MOCK_FRIENDS.filter(f => {
-    const matchesSearch = f.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = filter === 'all' || f.status === filter;
+  const filteredFriends = friends.filter(f => {
+    // Backend returns user objects, which might have displayName
+    const name = f.displayName || f.name || 'Unknown User';
+    const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase());
+    // For now, assuming all live friends are 'online' as status isn't tracked yet
+    const status = f.status || 'online';
+    const matchesFilter = filter === 'all' || status === filter;
     return matchesSearch && matchesFilter;
   });
 

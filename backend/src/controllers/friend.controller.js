@@ -39,3 +39,12 @@ export const getFriends = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const getRequests = async (req, res) => {
+  try {
+    const requests = await FriendService.getFriendRequests(req.user._id);
+    res.status(200).json(requests);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

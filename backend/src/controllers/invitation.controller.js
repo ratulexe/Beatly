@@ -22,3 +22,12 @@ export const respondToInvitation = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+export const getInvitations = async (req, res) => {
+  try {
+    const invitations = await InvitationService.getInvitations(req.user._id);
+    res.status(200).json(invitations);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};

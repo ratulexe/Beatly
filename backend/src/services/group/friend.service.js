@@ -63,3 +63,15 @@ export const getFriends = async (userId) => {
   const user = await User.findById(userId).populate('friends', 'displayName profileImage spotifyId');
   return user ? user.friends : [];
 };
+
+export const getFriendRequests = async (userId) => {
+  const incoming = await FriendRequest.find({ receiver: userId, status: 'pending' })
+    .populate('sender', 'displayName profileImage spotifyId')
+    .sort({ createdAt: -1 });
+    
+  const outgoing = await FriendRequest.find({ sender: userId, status: 'pending' })
+    .populate('receiver', 'displayName profileImage spotifyId')
+    .sort({ createdAt: -1 });
+
+  return { incoming, outgoing };
+};

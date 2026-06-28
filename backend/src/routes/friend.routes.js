@@ -7,6 +7,7 @@ const router = express.Router();
 router.use(spotifyAuth);
 
 router.get('/', FriendController.getFriends);
+router.get('/requests', FriendController.getRequests);
 router.post('/request', FriendController.sendRequest);
 router.patch('/request/:requestId', FriendController.respondToRequest);
 router.delete('/:friendId', FriendController.removeFriend);
