@@ -14,8 +14,15 @@ export const useProfile = () => {
   const syncMutation = useMutation({
     mutationFn: userApi.syncProfile,
     onSuccess: (data) => {
-      // Update the cache directly with the newly synced profile data
       queryClient.setQueryData(['userProfile'], data);
+    }
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: userApi.logout,
+    onSuccess: () => {
+      queryClient.clear(); // Clear all cached data on logout
+      window.location.href = '/login'; // Redirect to login page
     }
   });
 
@@ -25,6 +32,8 @@ export const useProfile = () => {
     isError: profileQuery.isError,
     error: profileQuery.error,
     syncProfile: syncMutation.mutate,
-    isSyncing: syncMutation.isPending
+    isSyncing: syncMutation.isPending,
+    logout: logoutMutation.mutate,
+    isLoggingOut: logoutMutation.isPending
   };
 };

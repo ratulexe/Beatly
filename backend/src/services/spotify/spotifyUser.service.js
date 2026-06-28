@@ -1,5 +1,6 @@
 import { User } from '../../database/index.js';
-import { createSpotifyClient } from './spotify/spotifyClient.js';
+import spotifyClient from './spotifyClient.js';
+import { SPOTIFY_ENDPOINTS } from '../../constants/spotifyEndpoints.js';
 import axios from 'axios';
 
 /**
@@ -8,7 +9,9 @@ import axios from 'axios';
  */
 export const syncUser = async (tokens) => {
   // 1. Fetch raw profile from Spotify using the raw access token
-  const response = await axios.get('https://api.spotify.com/v1/me', {
+  // We use axios directly here because this is during initial login and the user 
+  // document doesn't exist yet to pass to spotifyClient.
+  const response = await axios.get(`https://api.spotify.com/v1${SPOTIFY_ENDPOINTS.CURRENT_USER}`, {
     headers: { Authorization: `Bearer ${tokens.accessToken}` }
   });
   
@@ -40,7 +43,7 @@ export const syncUser = async (tokens) => {
   const user = await User.findOneAndUpdate(
     { spotifyId: profile.id },
     { $set: userData },
-    { new: true, upsert: true, setDefaultsOnInsert: true }
+    { returnDocument: 'after', upsert: true, setDefaultsOnInsert: true }
   );
 
   return user;
@@ -64,11 +67,8 @@ export const updateUserProfile = async (userId) => {
   const user = await User.findById(userId);
   if (!user) throw new Error('User not found in database');
 
-  // Use our intelligent client which handles token refresh automatically
-  const client = createSpotifyClient(user);
-  
-  const response = await client.get('/me');
-  const profile = response.data;
+  // Use our intelligent client which handles token refresh & rate limiting automatically
+  const profile = await spotifyClient.get(user, SPOTIFY_ENDPOINTS.CURRENT_USER);
 
   user.displayName = profile.display_name;
   user.email = profile.email;

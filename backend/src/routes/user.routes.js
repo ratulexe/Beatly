@@ -1,11 +1,11 @@
 import express from 'express';
-import { authenticate } from '../middlewares/authenticate.js';
+import { spotifyAuth } from '../middlewares/spotifyAuth.js';
 import * as userController from '../controllers/user.controller.js';
 
 const router = express.Router();
 
-// All user routes require authentication
-router.use(authenticate);
+// All user routes require authentication and Spotify connection
+router.use(spotifyAuth);
 
 router.get('/me', userController.getMe);
 router.get('/profile', userController.getProfile);

@@ -14,5 +14,10 @@ export const userApi = {
   syncProfile: async () => {
     const response = await api.patch('/user/sync');
     return response.data;
+  },
+  
+  logout: async () => {
+    const response = await api.post('/auth/logout');
+    return response.data;
   }
 };

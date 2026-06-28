@@ -1,8 +1,8 @@
-import { Clock, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Clock, ShieldCheck, RefreshCw, LogOut } from 'lucide-react';
 import { ProfileCard } from './ProfileCard.jsx';
 import { Button } from '../ui/Button.jsx';
 
-export const ProfileInfo = ({ profile, onSync, isSyncing }) => {
+export const ProfileInfo = ({ profile, onSync, isSyncing, onLogout, isLoggingOut }) => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -44,14 +44,23 @@ export const ProfileInfo = ({ profile, onSync, isSyncing }) => {
           </span>
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 space-y-3">
           <Button 
             onClick={onSync} 
-            disabled={isSyncing}
+            disabled={isSyncing || isLoggingOut}
             className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 flex justify-center items-center gap-2"
           >
             <RefreshCw size={18} className={isSyncing ? 'animate-spin' : ''} />
             {isSyncing ? 'Syncing with Spotify...' : 'Force Sync Profile'}
+          </Button>
+
+          <Button 
+            onClick={onLogout} 
+            disabled={isLoggingOut || isSyncing}
+            className="w-full bg-beatly-error/10 hover:bg-beatly-error/20 text-beatly-error border border-beatly-error/20 flex justify-center items-center gap-2"
+          >
+            <LogOut size={18} className={isLoggingOut ? 'animate-pulse' : ''} />
+            {isLoggingOut ? 'Logging out...' : 'Log Out'}
           </Button>
         </div>
       </div>

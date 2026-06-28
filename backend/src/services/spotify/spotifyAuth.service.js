@@ -1,6 +1,7 @@
 import axios from 'axios';
 import crypto from 'crypto';
-import { SPOTIFY_CONFIG } from '../config/spotify.js';
+import { SPOTIFY_CONFIG } from '../../config/spotify.config.js';
+import { sanitizeSpotifyError } from '../../utils/spotifyHelpers.js';
 
 export const generateState = () => {
   return crypto.randomBytes(16).toString('hex');
@@ -31,7 +32,8 @@ export const exchangeCodeForTokens = async (code) => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         'Authorization': `Basic ${authHeader}`
-      }
+      },
+      timeout: SPOTIFY_CONFIG.timeout
     });
 
     const { access_token, refresh_token, expires_in } = response.data;
@@ -41,32 +43,6 @@ export const exchangeCodeForTokens = async (code) => {
       expiresAt: Date.now() + expires_in * 1000
     };
   } catch (error) {
-    throw new Error('Failed to exchange code for tokens');
-  }
-};
-
-export const refreshAccessToken = async (refreshToken) => {
-  const authHeader = Buffer.from(`${SPOTIFY_CONFIG.clientId}:${SPOTIFY_CONFIG.clientSecret}`).toString('base64');
-  const params = new URLSearchParams({
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken
-  });
-
-  try {
-    const response = await axios.post(SPOTIFY_CONFIG.tokenUrl, params.toString(), {
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${authHeader}`
-      }
-    });
-
-    const { access_token, expires_in, refresh_token: new_refresh_token } = response.data;
-    return {
-      accessToken: access_token,
-      refreshToken: new_refresh_token || refreshToken,
-      expiresAt: Date.now() + expires_in * 1000
-    };
-  } catch (error) {
-    throw new Error('Failed to refresh access token');
+    throw sanitizeSpotifyError(error);
   }
 };

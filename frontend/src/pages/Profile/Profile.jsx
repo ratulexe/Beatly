@@ -6,7 +6,7 @@ import { ProfileSkeleton } from '../../components/profile/ProfileSkeleton.jsx';
 import { useProfile } from '../../hooks/useProfile.js';
 
 export default function Profile() {
-  const { profile, isLoading, isError, error, syncProfile, isSyncing } = useProfile();
+  const { profile, isLoading, isError, error, syncProfile, isSyncing, logout, isLoggingOut } = useProfile();
 
   if (isLoading) {
     return (
@@ -43,6 +43,8 @@ export default function Profile() {
               profile={profile} 
               onSync={syncProfile} 
               isSyncing={isSyncing} 
+              onLogout={logout}
+              isLoggingOut={isLoggingOut}
             />
           </div>
         </div>

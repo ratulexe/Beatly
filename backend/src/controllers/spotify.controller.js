@@ -1,5 +1,7 @@
 import { env } from '../config/env.js';
-import * as spotifyAuthService from '../services/spotifyAuth.service.js';
+import * as spotifyAuthService from '../services/spotify/spotifyAuth.service.js';
+import { syncUser } from '../services/spotify/spotifyUser.service.js';
+import { successResponse, errorResponse } from '../utils/apiResponse.js';
 
 export const login = (req, res) => {
   const state = spotifyAuthService.generateState();
@@ -15,7 +17,7 @@ export const callback = async (req, res, next) => {
   const storedState = req.session ? req.session.spotifyState : null;
 
   if (state === null || state !== storedState) {
-    return res.redirect(`${env.FRONTEND_URL}/login?error=state_mismatch`);
+    return res.redirect(`${env.CLIENT_URL}/login?error=state_mismatch`);
   }
 
   delete req.session.spotifyState; // Clear state after use
@@ -24,31 +26,30 @@ export const callback = async (req, res, next) => {
     const tokens = await spotifyAuthService.exchangeCodeForTokens(code);
     
     // Sync user into MongoDB
-    const { syncUser } = await import('../services/spotifyUser.service.js');
     const user = await syncUser(tokens);
     
     // Store only userId in session
     req.session.userId = user._id;
     
-    res.redirect(`${env.FRONTEND_URL}/profile`);
+    res.redirect(`${env.CLIENT_URL}/profile`);
   } catch (error) {
     console.error('Spotify callback error:', error);
-    return res.redirect(`${env.FRONTEND_URL}/login?error=invalid_token`);
+    return res.redirect(`${env.CLIENT_URL}/login?error=invalid_token`);
   }
 };
 
 export const refresh = async (req, res, next) => {
   // Now handled automatically by spotifyClient, this route can just be a no-op or trigger a manual sync
-  return res.status(200).json({ success: true, message: 'Refresh is handled automatically by the Spotify Client.' });
+  return res.status(200).json(successResponse(null, 'Refresh is handled automatically by the Spotify Client.'));
 };
 
 export const logout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).json({ success: false, message: 'Could not log out' });
+      return res.status(500).json(errorResponse('Could not log out'));
     }
     res.clearCookie('connect.sid'); 
-    res.status(200).json({ success: true, message: 'Logged out successfully' });
+    res.status(200).json(successResponse(null, 'Logged out successfully'));
   });
 };
 
