@@ -8,6 +8,11 @@ import RecentTracks from '../pages/RecentTracks/RecentTracks';
 import Analytics from '../pages/Analytics/Analytics';
 import Artists from '../pages/Artists/Artists';
 import Albums from '../pages/Albums/Albums';
+import Groups from '../pages/Groups/Groups';
+import CreateGroup from '../pages/Groups/CreateGroup';
+import GroupDetails from '../pages/Groups/GroupDetails';
+import Friends from '../pages/Friends/Friends';
+import Invitations from '../pages/Invitations/Invitations';
 import NotFound from '../pages/NotFound/NotFound';
 import DashboardLayout from '../layouts/DashboardLayout';
 import ProtectedRoute from './ProtectedRoute';
@@ -25,6 +30,11 @@ const AppRoutes = () => {
         <Route path="/recent" element={<RecentTracks />} />
         <Route path="/artists" element={<Artists />} />
         <Route path="/albums" element={<Albums />} />
+        <Route path="/groups" element={<Groups />} />
+        <Route path="/groups/create" element={<CreateGroup />} />
+        <Route path="/groups/:id" element={<GroupDetails />} />
+        <Route path="/friends" element={<Friends />} />
+        <Route path="/invitations" element={<Invitations />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
       </Route>

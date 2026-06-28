@@ -22,7 +22,8 @@ const userSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
   connectedAt: { type: Date, default: Date.now },
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, {
 
   timestamps: true,

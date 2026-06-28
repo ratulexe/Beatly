@@ -20,6 +20,9 @@ export default function DashboardLayout() {
     { name: 'Recent Tracks', path: '/recent', icon: Clock },
     { name: 'Top Artists', path: '/artists', icon: Users },
     { name: 'Top Albums', path: '/albums', icon: Disc },
+    { name: 'Groups', path: '/groups', icon: Users },
+    { name: 'Friends', path: '/friends', icon: User },
+    { name: 'Invitations', path: '/invitations', icon: Bell },
     { name: 'Profile', path: '/profile', icon: User },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
