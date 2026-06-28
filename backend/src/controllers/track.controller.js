@@ -8,11 +8,9 @@ export const syncTracks = async (req, res) => {
     const result = await spotifyTrackService.syncRecentlyPlayed(req.user);
     
     // Auto-trigger analytics generation in the background (fire and forget)
-    if (result.newTracks > 0) {
-      analyticsService.generateAllAnalytics(req.user._id).catch(err => {
-        console.error('[TrackController] Background analytics generation failed:', err);
-      });
-    }
+    analyticsService.generateAllAnalytics(req.user._id).catch(err => {
+      console.error('[TrackController] Background analytics generation failed:', err);
+    });
     
     return res.status(200).json(successResponse(result, 'Synchronization completed.'));
   } catch (error) {

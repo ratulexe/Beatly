@@ -1,4 +1,9 @@
-import api from './axios';
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:5000/api',
+  withCredentials: true 
+});
 
 export const analyticsApi = {
   generateAnalytics: () => api.post('/analytics/generate'),

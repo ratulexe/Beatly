@@ -1,1 +1,16 @@
-export const Card = ({ children }) => <div className="bg-beatly-card p-4 rounded-xl shadow-lg">{children}</div>;
+import React from 'react';
+import { motion } from 'framer-motion';
+
+export const Card = ({ children, className = '', noPadding = false, ...props }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={`glass-panel ${noPadding ? '' : 'p-6'} ${className}`}
+      {...props}
+    >
+      {children}
+    </motion.div>
+  );
+};

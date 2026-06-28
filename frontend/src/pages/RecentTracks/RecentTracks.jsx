@@ -6,8 +6,9 @@ import TrackFilters from '../../components/recentTracks/TrackFilters';
 import RecentTrackList from '../../components/recentTracks/RecentTrackList';
 import Pagination from '../../components/recentTracks/Pagination';
 import NowPlaying from '../../components/recentTracks/NowPlaying';
+import { Clock } from 'lucide-react';
 
-const RecentTracks = () => {
+export default function RecentTracks() {
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -18,7 +19,6 @@ const RecentTracks = () => {
   const handleSync = () => {
     syncMutation.mutate(undefined, {
       onSuccess: () => {
-        // Reset to page 1 to see the newest tracks
         setPage(1);
       }
     });
@@ -29,17 +29,25 @@ const RecentTracks = () => {
 
   if (isError) {
     return (
-      <div style={styles.container}>
-        <div className="glass-panel" style={{ padding: '20px', color: '#ff4b4b' }}>
-          <h3>Error loading tracks</h3>
-          <p>{error.message || 'Something went wrong.'}</p>
-        </div>
+      <div className="p-8 text-center bg-beatly-error/10 border border-beatly-error/20 rounded-2xl">
+        <h3 className="text-lg font-bold text-white mb-2">Error loading tracks</h3>
+        <p className="text-beatly-error">{error.message || 'Something went wrong.'}</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
+    <div className="pb-10 max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-12 h-12 bg-blue-400/10 text-blue-400 rounded-2xl flex items-center justify-center">
+          <Clock size={28} />
+        </div>
+        <div>
+          <h1 className="text-3xl font-extrabold mb-1">Recent Tracks</h1>
+          <p className="text-beatly-text-muted font-semibold">Your Spotify listening history</p>
+        </div>
+      </div>
+
       <NowPlaying data={nowPlayingData} />
 
       <TrackFilters 
@@ -49,7 +57,7 @@ const RecentTracks = () => {
       />
       
       {syncMutation.isError && (
-        <div style={{ padding: '10px', background: 'rgba(255,0,0,0.1)', color: '#ff4b4b', borderRadius: '8px', marginBottom: '20px' }}>
+        <div className="p-4 bg-beatly-error/10 text-beatly-error rounded-xl font-bold">
           Failed to sync: {syncMutation.error.message}
         </div>
       )}
@@ -68,14 +76,4 @@ const RecentTracks = () => {
       )}
     </div>
   );
-};
-
-const styles = {
-  container: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    padding: '20px',
-  }
-};
-
-export default RecentTracks;
+}
