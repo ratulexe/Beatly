@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Image as ImageIcon, Users } from 'lucide-react';
-
+import { useGroups } from '../../hooks/useGroups';
 const CreateGroup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ const CreateGroup = () => {
     description: '',
     isPrivate: false
   });
+  const { createGroup, loading, error } = useGroups();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -18,12 +19,14 @@ const CreateGroup = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement creation logic here
-    console.log('Creating group:', formData);
-    // Mock success, navigate back
-    navigate('/groups');
+    try {
+      const newGroup = await createGroup(formData);
+      navigate(`/groups/${newGroup._id || newGroup.id}`);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (

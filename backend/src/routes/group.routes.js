@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.use(spotifyAuth);
 
+router.get('/', GroupController.getUserGroups);
 router.post('/', GroupController.createGroup);
 router.get('/:groupId', GroupController.getGroup);
 router.patch('/:groupId', GroupController.updateGroup);

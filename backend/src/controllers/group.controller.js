@@ -9,6 +9,15 @@ export const createGroup = async (req, res) => {
   }
 };
 
+export const getUserGroups = async (req, res) => {
+  try {
+    const groups = await GroupService.getUserGroups(req.user._id);
+    res.status(200).json(groups);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 export const getGroup = async (req, res) => {
   try {
     const group = await GroupService.getGroupById(req.params.groupId);

@@ -14,6 +14,10 @@ export const getGroupById = async (groupId) => {
   return await Group.findById(groupId).populate('members admins createdBy');
 };
 
+export const getUserGroups = async (userId) => {
+  return await Group.find({ members: userId }).populate('createdBy', 'displayName profileImage').sort({ createdAt: -1 });
+};
+
 export const updateGroup = async (groupId, updateData, userId) => {
   const group = await Group.findOne({ _id: groupId, admins: userId });
   if (!group) throw new Error('Group not found or unauthorized');

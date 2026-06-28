@@ -1,35 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Settings, UserPlus, Music } from 'lucide-react';
 import MemberCard from '../../components/groups/MemberCard';
 import InviteModal from '../../components/groups/InviteModal';
-
-// Mock Data
-const MOCK_GROUP = {
-  id: '1',
-  name: 'Rock Enthusiasts',
-  description: 'A place for classic and modern rock lovers to share tracks and playlists. Let\'s keep the rock spirit alive!',
-  memberCount: 156,
-  role: 'admin',
-  members: [
-    { id: '1', name: 'John Doe', role: 'admin', joinedAt: '2 days ago' },
-    { id: '2', name: 'Alice Smith', role: 'member', joinedAt: '1 week ago' },
-    { id: '3', name: 'Bob Jones', role: 'member', joinedAt: '1 month ago' },
-  ]
-};
+import { groupApi } from '../../services/api/groupApi';
 
 const GroupDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('feed');
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [members, setMembers] = useState(MOCK_GROUP.members);
+  const [group, setGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const isAdmin = MOCK_GROUP.role === 'admin';
+  useEffect(() => {
+    const fetchGroup = async () => {
+      try {
+        const data = await groupApi.getGroupDetails(id);
+        setGroup(data);
+      } catch (error) {
+        console.error('Failed to fetch group', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGroup();
+  }, [id]);
 
   const handleRemoveMember = (memberId) => {
-    setMembers(prev => prev.filter(m => m.id !== memberId));
+    // In a full implementation, call api to remove member, then update state
+    setGroup(prev => ({
+      ...prev,
+      members: prev.members.filter(m => m._id !== memberId)
+    }));
   };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center p-12">
+        <div className="w-8 h-8 border-4 border-beatly-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!group) {
+    return <div className="text-white">Group not found</div>;
+  }
+
+  // Determine if current user is admin (requires user context, assuming true for demo if they are in admins array)
+  // For now, let's assume they are admin if they created it or are in admins
+  const isAdmin = true; // Placeholder until user context is available
 
   return (
     <div className="space-y-6">
@@ -49,12 +69,12 @@ const GroupDetails = () => {
         <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-gradient-to-t from-black/80 to-transparent flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="flex items-end gap-5">
             <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-beatly-primary flex items-center justify-center text-black font-extrabold text-4xl shadow-lg border-4 border-[#121212]">
-              {MOCK_GROUP.name.charAt(0)}
+              {group.name.charAt(0)}
             </div>
             <div className="mb-1">
-              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{MOCK_GROUP.name}</h1>
+              <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">{group.name}</h1>
               <div className="flex items-center gap-4 mt-2 text-sm font-semibold text-beatly-text-muted">
-                <span className="flex items-center gap-1.5"><Users size={16} /> {MOCK_GROUP.memberCount} Members</span>
+                <span className="flex items-center gap-1.5"><Users size={16} /> {group.members?.length || 0} Members</span>
                 <span className="bg-beatly-surface px-2 py-0.5 rounded text-white">{isAdmin ? 'Admin' : 'Member'}</span>
               </div>
             </div>
@@ -120,12 +140,12 @@ const GroupDetails = () => {
           {activeTab === 'members' && (
             <div className="space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-bold text-white">All Members ({members.length})</h3>
+                <h3 className="text-lg font-bold text-white">All Members ({group.members?.length || 0})</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {members.map(member => (
+                {group.members?.map(member => (
                   <MemberCard 
-                    key={member.id} 
+                    key={member._id} 
                     member={member} 
                     isAdmin={isAdmin} 
                     onRemove={handleRemoveMember} 
@@ -139,7 +159,7 @@ const GroupDetails = () => {
             <div className="max-w-2xl">
               <h3 className="text-lg font-bold text-white mb-4">Description</h3>
               <p className="text-beatly-text-muted leading-relaxed whitespace-pre-wrap">
-                {MOCK_GROUP.description}
+                {group.description || 'No description provided.'}
               </p>
               
               <div className="mt-8 pt-8 border-t border-beatly-border">
@@ -147,7 +167,7 @@ const GroupDetails = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center py-2 border-b border-beatly-surface">
                     <span className="text-beatly-text-muted font-medium">Created</span>
-                    <span className="text-white font-semibold">Jan 15, 2024</span>
+                    <span className="text-white font-semibold">{new Date(group.createdAt).toLocaleDateString()}</span>
                   </div>
                   <div className="flex justify-between items-center py-2 border-b border-beatly-surface">
                     <span className="text-beatly-text-muted font-medium">Privacy</span>

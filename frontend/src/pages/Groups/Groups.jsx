@@ -3,18 +3,14 @@ import { Plus, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import GroupCard from '../../components/groups/GroupCard';
 
-// Mock Data
-const MOCK_GROUPS = [
-  { id: '1', name: 'Rock Enthusiasts', description: 'A place for classic and modern rock lovers to share tracks and playlists.', memberCount: 156, role: 'admin' },
-  { id: '2', name: 'Jazz & Blues Vibes', description: 'Smooth jazz and deep blues. Share your favorite artists and discoveries.', memberCount: 89, role: 'member' },
-  { id: '3', name: 'Electronic Dance Crew', description: 'EDM, House, Techno. Let the beat drop!', memberCount: 342, role: 'member' },
-];
+import { useGroups } from '../../hooks/useGroups';
 
 const Groups = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const { groups, loading, error } = useGroups();
 
-  const filteredGroups = MOCK_GROUPS.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredGroups = groups.filter(g => g.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
     <div className="space-y-6">
@@ -43,7 +39,13 @@ const Groups = () => {
         />
       </div>
 
-      {filteredGroups.length === 0 ? (
+      {loading ? (
+        <div className="flex justify-center p-12">
+          <div className="w-8 h-8 border-4 border-beatly-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      ) : error ? (
+        <div className="glass-panel p-6 rounded-2xl text-red-500 text-center">{error}</div>
+      ) : filteredGroups.length === 0 ? (
         <div className="glass-panel p-12 flex flex-col items-center justify-center text-center rounded-2xl">
           <div className="w-16 h-16 bg-beatly-surface-hover rounded-full flex items-center justify-center mb-4">
             <Search className="text-beatly-text-muted" size={32} />
