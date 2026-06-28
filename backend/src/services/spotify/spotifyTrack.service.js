@@ -1,6 +1,8 @@
 import spotifyClient from './spotifyClient.js';
 import { SPOTIFY_ENDPOINTS } from '../../constants/spotifyEndpoints.js';
 import { trackRepository } from '../database/trackRepository.js';
+import { Artist } from '../../database/index.js';
+import { getMultipleArtists } from './spotifyArtist.service.js';
 
 export const getRecentlyPlayed = async (user, limit = 50, after = null, before = null) => {
   const params = { limit };
@@ -48,6 +50,33 @@ export const syncRecentlyPlayed = async (user) => {
     
     if (track.artists) {
       rawArtists.push(...track.artists);
+    }
+  }
+
+  // 2.5 Fetch full artist objects (for images) for missing artists
+  const uniqueArtistIds = Array.from(new Set(rawArtists.map(a => a.id)));
+  const existingArtistsWithImages = await Artist.find({ 
+    spotifyArtistId: { $in: uniqueArtistIds },
+    image: { $ne: null }
+  }).select('spotifyArtistId').lean();
+  
+  const existingIdsWithImages = new Set(existingArtistsWithImages.map(a => a.spotifyArtistId));
+  const missingIds = uniqueArtistIds.filter(id => !existingIdsWithImages.has(id));
+
+  if (missingIds.length > 0) {
+    const fullArtists = [];
+    for (let i = 0; i < missingIds.length; i += 50) {
+      const chunk = missingIds.slice(i, i + 50);
+      const fetched = await getMultipleArtists(user, chunk);
+      fullArtists.push(...fetched);
+    }
+    
+    const fullArtistMap = new Map(fullArtists.map(a => [a.id, a]));
+    for (let i = 0; i < rawArtists.length; i++) {
+      const full = fullArtistMap.get(rawArtists[i].id);
+      if (full) {
+        rawArtists[i] = full;
+      }
     }
   }
 

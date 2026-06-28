@@ -6,7 +6,7 @@ export const useGenres = () => {
     queryKey: ['analytics', 'genres'],
     queryFn: async () => {
       const { data } = await analyticsApi.getGenres();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

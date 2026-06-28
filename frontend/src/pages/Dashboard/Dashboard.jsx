@@ -75,7 +75,7 @@ export default function Dashboard() {
             <div className="relative mb-6 group">
               <div className="absolute inset-0 bg-beatly-primary blur-3xl opacity-20 group-hover:opacity-40 transition-opacity rounded-full"></div>
               <img 
-                src={favoriteArtist.image} 
+                src={favoriteArtist.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(favoriteArtist.name)}&background=1ED760&color=000&size=256`} 
                 alt={favoriteArtist.name} 
                 className="w-40 h-40 object-cover rounded-full border-4 border-beatly-surface shadow-2xl relative z-10"
               />

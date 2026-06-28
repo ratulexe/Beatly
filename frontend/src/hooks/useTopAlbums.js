@@ -6,7 +6,7 @@ export const useTopAlbums = () => {
     queryKey: ['analytics', 'topAlbums'],
     queryFn: async () => {
       const { data } = await analyticsApi.getTopAlbums();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

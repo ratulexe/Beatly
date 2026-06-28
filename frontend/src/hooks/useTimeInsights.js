@@ -6,7 +6,7 @@ export const useTimeInsights = () => {
     queryKey: ['analytics', 'timeInsights'],
     queryFn: async () => {
       const { data } = await analyticsApi.getTimeInsights();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

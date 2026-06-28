@@ -6,7 +6,7 @@ export const useTopTracks = () => {
     queryKey: ['analytics', 'topTracks'],
     queryFn: async () => {
       const { data } = await analyticsApi.getTopTracks();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

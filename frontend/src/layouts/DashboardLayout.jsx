@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Home, BarChart2, Clock, Users, Disc, User, Settings, LogOut, Menu, X, Search, Bell } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { useProfile } from '../hooks/useProfile';
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { logout, user } = useAuth();
+  const { logout, profile: user } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
 

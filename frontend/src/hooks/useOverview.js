@@ -6,7 +6,7 @@ export const useOverview = () => {
     queryKey: ['analytics', 'overview'],
     queryFn: async () => {
       const { data } = await analyticsApi.getOverview();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,

@@ -6,7 +6,7 @@ export const useTopArtists = () => {
     queryKey: ['analytics', 'topArtists'],
     queryFn: async () => {
       const { data } = await analyticsApi.getTopArtists();
-      return data;
+      return data.data;
     },
     staleTime: 10 * 60 * 1000,
     refetchOnWindowFocus: false,

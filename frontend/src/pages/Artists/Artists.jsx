@@ -41,7 +41,7 @@ export default function Artists() {
               <div className="relative mb-4">
                 <div className="absolute inset-0 bg-beatly-primary blur-2xl opacity-0 group-hover:opacity-30 transition-opacity rounded-full"></div>
                 <img 
-                  src={artist.image || '/default-avatar.png'} 
+                  src={artist.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=1ED760&color=000&size=256`} 
                   alt={artist.name} 
                   className="w-32 h-32 object-cover rounded-full shadow-lg relative z-10"
                 />

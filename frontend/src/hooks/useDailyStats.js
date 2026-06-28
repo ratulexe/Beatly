@@ -6,7 +6,7 @@ export const useDailyStats = (days = 7) => {
     queryKey: ['analytics', 'daily', days],
     queryFn: async () => {
       const { data } = await analyticsApi.getDailyStats(days);
-      return data;
+      return data.data;
     },
     staleTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,

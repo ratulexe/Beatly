@@ -40,7 +40,7 @@ export default function Albums() {
             <Card className="flex flex-col group cursor-pointer hover:bg-beatly-surface-hover transition-colors h-full">
               <div className="relative mb-4 overflow-hidden rounded-lg">
                 <img 
-                  src={album.image || '/default-album.png'} 
+                  src={album.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(album.name)}&background=222222&color=fff&size=256`} 
                   alt={album.name} 
                   className="w-full aspect-square object-cover shadow-lg group-hover:scale-105 transition-transform duration-500"
                 />
