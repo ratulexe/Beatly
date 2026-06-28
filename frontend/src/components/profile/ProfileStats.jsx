@@ -9,7 +9,7 @@ export const ProfileStats = ({ profile }) => {
           <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl shrink-0">
             <Users size={24} />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-2xl font-bold text-white truncate">
               {profile.followers?.toLocaleString() || 0}
             </div>
@@ -22,7 +22,7 @@ export const ProfileStats = ({ profile }) => {
           <div className="p-3 bg-purple-500/10 text-purple-500 rounded-xl shrink-0">
             <Crown size={24} />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-xl sm:text-2xl font-bold text-white capitalize truncate">
               {profile.product || 'Free'}
             </div>
@@ -35,7 +35,7 @@ export const ProfileStats = ({ profile }) => {
           <div className="p-3 bg-emerald-500/10 text-emerald-500 rounded-xl shrink-0">
             <Globe size={24} />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <div className="text-2xl font-bold text-white uppercase truncate">
               {profile.country || 'N/A'}
             </div>
