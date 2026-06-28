@@ -60,3 +60,16 @@ npm install
 cd backend
 npm run dev
 \`\`\`
+
+## Spotify Developer Configuration
+To enable authentication, you must configure a Spotify Application:
+1. Go to the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard/).
+2. Create an App.
+3. Add the following **Redirect URI** to your app settings: \`http://localhost:5000/api/auth/callback\`
+4. Copy your **Client ID** and **Client Secret**.
+5. Add them to your \`backend/.env\` file:
+\`\`\`env
+SPOTIFY_CLIENT_ID=your_client_id
+SPOTIFY_CLIENT_SECRET=your_client_secret
+SPOTIFY_REDIRECT_URI=http://localhost:5000/api/auth/callback
+\`\`\`
