@@ -3,7 +3,7 @@ import { ProfileCard } from './ProfileCard.jsx';
 
 export const ProfileStats = ({ profile }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+    <div className="flex flex-col gap-6">
       <ProfileCard title="Followers" delay={0.1}>
         <div className="flex items-center gap-3 xl:gap-4">
           <div className="p-3 bg-blue-500/10 text-blue-500 rounded-xl shrink-0">
