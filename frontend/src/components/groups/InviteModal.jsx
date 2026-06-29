@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import { X, Search, Check, Send } from 'lucide-react';
+import { useFriends } from '../../../hooks/useFriends';
+import { invitationApi } from '../../../services/api/invitationApi';
 
 const InviteModal = ({ isOpen, onClose, groupId }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFriends, setSelectedFriends] = useState([]);
+  const [isSending, setIsSending] = useState(false);
+  const { friends, loading } = useFriends();
 
-  // Mock friends data
-  const friends = [
-    { id: '1', name: 'Alice Smith', username: '@alice' },
-    { id: '2', name: 'Bob Jones', username: '@bobby' },
-    { id: '3', name: 'Charlie Brown', username: '@charlie' },
-  ].filter(f => f.name.toLowerCase().includes(searchQuery.toLowerCase()) || f.username.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredFriends = friends?.filter(f => {
+    const name = f.displayName || f.name || '';
+    const username = f.username || '';
+    return name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+           username.toLowerCase().includes(searchQuery.toLowerCase());
+  }) || [];
 
   const toggleFriend = (id) => {
     setSelectedFriends(prev => 
@@ -18,10 +22,22 @@ const InviteModal = ({ isOpen, onClose, groupId }) => {
     );
   };
 
-  const handleSendInvites = () => {
-    // Implement invite logic here
-    console.log('Sending invites to', selectedFriends, 'for group', groupId);
-    onClose();
+  const handleSendInvites = async () => {
+    try {
+      setIsSending(true);
+      await Promise.all(
+        selectedFriends.map(friendId => invitationApi.sendInvitation(friendId, groupId))
+      );
+      onClose();
+      // Reset state for next time
+      setSelectedFriends([]);
+      setSearchQuery('');
+    } catch (error) {
+      console.error('Failed to send invites:', error);
+      // In a real app, show a toast notification here
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -50,46 +66,61 @@ const InviteModal = ({ isOpen, onClose, groupId }) => {
         </div>
 
         <div className="flex-1 overflow-y-auto p-2">
-          {friends.length === 0 ? (
+          {loading ? (
+            <div className="p-8 text-center text-beatly-text-muted text-sm font-medium">
+              Loading friends...
+            </div>
+          ) : filteredFriends.length === 0 ? (
             <div className="p-8 text-center text-beatly-text-muted text-sm font-medium">
               No friends found.
             </div>
           ) : (
-            friends.map(friend => (
-              <div 
-                key={friend.id}
-                onClick={() => toggleFriend(friend.id)}
-                className="flex items-center justify-between p-3 rounded-xl hover:bg-beatly-surface-hover cursor-pointer transition-colors m-1"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-beatly-primary/20 flex items-center justify-center text-beatly-primary font-bold">
-                    {friend.name.charAt(0)}
+            filteredFriends.map(friend => {
+              const name = friend.displayName || friend.name || 'Unknown';
+              const profileImg = friend.profileImage;
+              return (
+                <div 
+                  key={friend._id}
+                  onClick={() => toggleFriend(friend._id)}
+                  className="flex items-center justify-between p-3 rounded-xl hover:bg-beatly-surface-hover cursor-pointer transition-colors m-1"
+                >
+                  <div className="flex items-center gap-3">
+                    {profileImg ? (
+                      <img src={profileImg} alt={name} className="w-10 h-10 rounded-full object-cover" />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-beatly-primary/20 flex items-center justify-center text-beatly-primary font-bold">
+                        {name.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="text-sm font-bold text-white">{name}</h4>
+                      {/* For now we don't have a specific username field populated everywhere, but if present we display it */}
+                      {(friend.username || friend.spotifyId) && (
+                        <p className="text-xs text-beatly-text-muted">{friend.username || friend.spotifyId}</p>
+                      )}
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white">{friend.name}</h4>
-                    <p className="text-xs text-beatly-text-muted">{friend.username}</p>
+                  <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+                    selectedFriends.includes(friend._id) 
+                      ? 'bg-beatly-primary border-beatly-primary text-black' 
+                      : 'border-beatly-text-muted/50'
+                  }`}>
+                    {selectedFriends.includes(friend._id) && <Check size={14} strokeWidth={3} />}
                   </div>
                 </div>
-                <div className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
-                  selectedFriends.includes(friend.id) 
-                    ? 'bg-beatly-primary border-beatly-primary text-black' 
-                    : 'border-beatly-text-muted/50'
-                }`}>
-                  {selectedFriends.includes(friend.id) && <Check size={14} strokeWidth={3} />}
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
         <div className="p-5 border-t border-beatly-border bg-beatly-surface/30">
           <button 
             onClick={handleSendInvites}
-            disabled={selectedFriends.length === 0}
+            disabled={selectedFriends.length === 0 || isSending}
             className="w-full bg-beatly-primary hover:bg-beatly-primary/90 text-black font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send size={18} />
-            Send Invites {selectedFriends.length > 0 && `(${selectedFriends.length})`}
+            {isSending ? 'Sending...' : `Send Invites ${selectedFriends.length > 0 ? `(${selectedFriends.length})` : ''}`}
           </button>
         </div>
       </div>
