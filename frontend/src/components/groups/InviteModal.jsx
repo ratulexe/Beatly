@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Search, Check, Send } from 'lucide-react';
-import { useFriends } from '../../../hooks/useFriends';
-import { invitationApi } from '../../../services/api/invitationApi';
+import { useFriends } from '../../hooks/useFriends';
+import { invitationApi } from '../../services/api/invitationApi';
 
 const InviteModal = ({ isOpen, onClose, groupId }) => {
   const [searchQuery, setSearchQuery] = useState('');
