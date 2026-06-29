@@ -40,11 +40,17 @@ export default function Artists() {
             <Card className="flex flex-col items-center text-center group cursor-pointer hover:bg-beatly-surface-hover transition-colors h-full">
               <div className="relative mb-4">
                 <div className="absolute inset-0 bg-beatly-primary blur-2xl opacity-0 group-hover:opacity-30 transition-opacity rounded-full"></div>
-                <img 
-                  src={artist.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(artist.name)}&background=1ED760&color=000&size=256`} 
-                  alt={artist.name} 
-                  className="w-32 h-32 object-cover rounded-full shadow-lg relative z-10"
-                />
+                {artist.image ? (
+                  <img 
+                    src={artist.image} 
+                    alt={artist.name} 
+                    className="w-32 h-32 object-cover rounded-full shadow-lg relative z-10"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full shadow-lg relative z-10 bg-beatly-primary/20 border border-beatly-primary flex items-center justify-center text-beatly-primary text-4xl font-bold uppercase">
+                    {artist.name ? artist.name.charAt(0) : '?'}
+                  </div>
+                )}
               </div>
               <h3 className="font-bold text-lg leading-tight mb-2 truncate w-full">{artist.name}</h3>
               <div className="mt-auto">
