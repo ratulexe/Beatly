@@ -5,10 +5,11 @@ import { AchievementCard } from '../components/achievements/AchievementCard';
 describe('AchievementCard', () => {
   const mockAchievement = {
     id: 'first_blood',
-    name: 'First Blood',
+    title: 'First Blood',
     description: 'Listen to your first track',
     icon: 'music',
-    rarity: 'common'
+    rarity: 'Common',
+    xpReward: 100,
   };
 
   it('renders locked state correctly', () => {
