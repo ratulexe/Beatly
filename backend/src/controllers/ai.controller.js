@@ -5,7 +5,7 @@ import { generateSummary } from '../services/ai/summary.service.js';
 import { getAIProvider } from '../services/ai/aiFactory.js';
 import { promptBuilder, systemPrompts } from '../services/ai/promptBuilder.js';
 import { analyticsRepository } from '../services/database/analyticsRepository.js';
-import { cacheService } from '../services/cache/cacheService.js';
+import { cacheService } from '../services/cache/CacheService.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 import logger from '../config/logger.js';
 
