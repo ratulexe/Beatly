@@ -2,7 +2,7 @@ import Device from '../../models/Device.model.js';
 import crypto from 'crypto';
 
 export const registerDevice = async (userId, deviceData) => {
-  const sessionId = crypto.randomBytes(32).toString('hex');
+  const sessionId = deviceData.sessionId || crypto.randomBytes(32).toString('hex');
   
   const query = {
     user: userId,

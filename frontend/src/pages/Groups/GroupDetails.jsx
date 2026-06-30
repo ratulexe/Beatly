@@ -4,6 +4,7 @@ import { ArrowLeft, Users, Settings, UserPlus, Music } from 'lucide-react';
 import MemberCard from '../../components/groups/MemberCard';
 import InviteModal from '../../components/groups/InviteModal';
 import { groupApi } from '../../services/api/groupApi';
+import { useProfile } from '../../hooks/useProfile';
 
 const GroupDetails = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const GroupDetails = () => {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { profile } = useProfile();
 
   useEffect(() => {
     const fetchGroup = async () => {
@@ -27,8 +29,8 @@ const GroupDetails = () => {
     fetchGroup();
   }, [id]);
 
-  const handleRemoveMember = (memberId) => {
-    // In a full implementation, call api to remove member, then update state
+  const handleRemoveMember = async (memberId) => {
+    await groupApi.removeMember(id, memberId);
     setGroup(prev => ({
       ...prev,
       members: prev.members.filter(m => m._id !== memberId)
@@ -47,9 +49,8 @@ const GroupDetails = () => {
     return <div className="text-white">Group not found</div>;
   }
 
-  // Determine if current user is admin (requires user context, assuming true for demo if they are in admins array)
-  // For now, let's assume they are admin if they created it or are in admins
-  const isAdmin = true; // Placeholder until user context is available
+  const currentUserId = profile?._id || profile?.id;
+  const isAdmin = group.admins?.some(admin => String(admin._id || admin) === String(currentUserId));
 
   return (
     <div className="space-y-6">

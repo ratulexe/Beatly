@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { DeviceCard } from './DeviceCard';
 import SessionCard from './SessionCard';
 import OfflineBanner from '../../../components/sync/OfflineBanner';
@@ -7,46 +7,45 @@ import { ConnectionStatus } from '../../../components/sync/ConnectionStatus';
 import { SyncIndicator } from '../../../components/sync/SyncIndicator';
 import { api } from '../../../services/apiClient';
 import { useSync } from '../../../context/SyncContext';
+import { ErrorState } from '../../../components/ui/ErrorState';
 
 const Devices = () => {
-  const [devices, setDevices] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const { deviceId, triggerSync } = useSync();
 
-  useEffect(() => {
-    fetchDevices();
-  }, []);
-
-  const fetchDevices = async () => {
-    try {
+  const devicesQuery = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
       const res = await api.get('/api/devices');
-      setDevices(Array.isArray(res) ? res : (res.devices || res.data || []));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+      return Array.isArray(res) ? res : (res.devices || res.data || []);
+    },
+    staleTime: 60 * 1000,
+    retry: 1
+  });
 
-  const handleRemoveDevice = async (id) => {
-    try {
-      await api.delete(`/api/devices/${id}`);
-      setDevices(prev => prev.filter(d => d._id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const removeDeviceMutation = useMutation({
+    mutationFn: (id) => api.delete(`/api/devices/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['devices'] })
+  });
 
-  const handleRevokeSession = async (sessionId) => {
-    try {
-      await api.post('/api/session/logout-device', { sessionId });
-      setDevices(prev => prev.filter(d => d.sessionId !== sessionId));
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const revokeSessionMutation = useMutation({
+    mutationFn: (sessionId) => api.post('/api/session/logout-device', { sessionId }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['devices'] })
+  });
 
-  if (loading) return <div className="p-8">Loading devices...</div>;
+  if (devicesQuery.isLoading) return <div className="p-8">Loading devices...</div>;
+
+  if (devicesQuery.isError) {
+    return (
+      <ErrorState
+        title="Failed to load devices"
+        message="Beatly could not load your connected devices."
+        onRetry={devicesQuery.refetch}
+      />
+    );
+  }
+
+  const devices = devicesQuery.data || [];
 
   return (
     <div className="flex flex-col gap-6 max-w-3xl mx-auto p-6">
@@ -74,9 +73,14 @@ const Devices = () => {
             key={device._id} 
             device={device} 
             isCurrentDevice={device._id === deviceId}
-            onRemove={handleRemoveDevice}
+            onRemove={(id) => removeDeviceMutation.mutate(id)}
           />
         ))}
+        {devices.length === 0 && (
+          <div className="rounded-2xl border border-white/10 bg-beatly-surface p-8 text-center text-gray-400">
+            No connected devices found.
+          </div>
+        )}
       </div>
 
       <div className="mt-4">
@@ -87,7 +91,7 @@ const Devices = () => {
               key={device.sessionId}
               session={device}
               isCurrent={device._id === deviceId}
-              onRevoke={handleRevokeSession}
+              onRevoke={(sessionId) => revokeSessionMutation.mutate(sessionId)}
             />
           ))}
         </div>

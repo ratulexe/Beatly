@@ -61,7 +61,7 @@ export const SyncProvider = ({ children }) => {
     // Beatly uses cookies for auth, so we don't need to check localStorage for a token
     // If the API calls fail with 401, they'll be caught below
 
-    socketRef.current = io('/', {
+    socketRef.current = io(api.defaults.baseURL || 'http://127.0.0.1:5000', {
       path: '/socket.io',
       withCredentials: true
     });

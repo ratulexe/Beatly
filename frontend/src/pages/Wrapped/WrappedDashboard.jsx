@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Play, Sparkles, Image, Clock, Share2, Music, Crown, TrendingUp, Calendar, Download, FileText, ChevronRight } from 'lucide-react';
 import StoryViewer from './WrappedViewer/StoryViewer';
 import ComparisonCard from './WrappedCompare/ComparisonCard';
@@ -32,11 +33,11 @@ const THEMES = [
 ];
 
 export default function WrappedDashboard() {
+  const queryClient = useQueryClient();
   const [activeTheme, setActiveTheme] = useState('classic');
   const [isPlaying, setIsPlaying] = useState(false);
   const [generateState, setGenerateState] = useState('idle'); // idle, generating, ready
   const [timeframe, setTimeframe] = useState('monthly');
-  const [archive, setArchive] = useState([]);
   const [activeReport, setActiveReport] = useState(null);
   const [activeSlides, setActiveSlides] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
@@ -46,35 +47,31 @@ export default function WrappedDashboard() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  useEffect(() => {
-    fetchArchive();
-  }, []);
+  const archiveQuery = useQuery({
+    queryKey: ['wrapped', 'archive'],
+    queryFn: () => api.get('/api/wrapped/archive'),
+    staleTime: 5 * 60 * 1000,
+    retry: 1
+  });
 
-  const fetchArchive = async () => {
-    try {
-      const response = await api.get('/api/wrapped/archive');
-      setArchive(response);
-    } catch (error) {
-      console.error('Failed to load wrapped archive', error);
-    }
-  };
+  const generateWrappedMutation = useMutation({
+    mutationFn: async ({ type, periodOptions }) => api.post('/api/wrapped/generate', { type, periodOptions }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['wrapped', 'archive'] })
+  });
 
   const handleGenerate = async () => {
     setGenerateState('generating');
     try {
       const year = new Date().getFullYear();
-      const res = await api.post('/api/wrapped/generate', { 
+      const res = await generateWrappedMutation.mutateAsync({
         type: timeframe, 
         periodOptions: { year, month: new Date().getMonth() + 1 }
       });
-      // The generate route currently returns just the report
-      // So let's fetch the slides for it now
       const reportRes = await api.get(`/api/wrapped/${res._id}`);
       
       setActiveReport(reportRes.report);
       setActiveSlides(reportRes.slides);
       setGenerateState('ready');
-      fetchArchive(); // Refresh archive list
     } catch (e) {
       console.error(e);
       setGenerateState('idle');
@@ -163,7 +160,7 @@ export default function WrappedDashboard() {
           <h2 className="text-3xl font-extrabold text-center">Your Audio Aura</h2>
           <div className="w-full aspect-square rounded-full bg-gradient-to-tr from-[var(--wrapped-primary)] to-[var(--wrapped-accent)] blur-2xl opacity-50 absolute -z-10" />
           <p className="text-2xl font-bold text-center leading-relaxed">
-            {data.personality || 'Energetic & Wistful'}
+            {data.personality || 'N/A'}
           </p>
           <p className="text-sm opacity-70 text-center">{data.summary}</p>
         </div>
@@ -201,6 +198,7 @@ export default function WrappedDashboard() {
     type: slide.template,
     content: renderSlideContent(slide)
   }));
+  const archive = archiveQuery.data || [];
 
   if (isPlaying && mappedSlides.length > 0) {
     return (

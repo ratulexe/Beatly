@@ -1,6 +1,4 @@
 import { Challenge } from '../../models/Challenge.model.js';
-import { Group } from '../../models/Group.model.js';
-
 export const challengeService = {
   async getActiveChallenges(userId) {
     const now = new Date();
@@ -12,19 +10,6 @@ export const challengeService = {
       ],
       endDate: { $gt: now }
     });
-
-    if (challenges.length === 0) {
-      const demo = await this.generateGlobalChallenge(
-        "Weekend Warriors",
-        "Listen to 10 hours of music this weekend with the entire Beatly community!",
-        "Listening Time",
-        "Weekly",
-        10,
-        "hours",
-        3
-      );
-      challenges.push(demo);
-    }
 
     return challenges;
   },

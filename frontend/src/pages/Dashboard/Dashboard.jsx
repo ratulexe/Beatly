@@ -1,6 +1,7 @@
 import React from 'react';
 import { useOverview } from '../../hooks/useOverview';
 import { useTopArtists } from '../../hooks/useTopArtists';
+import { useDailyStats } from '../../hooks/useDailyStats';
 import { Card } from '../../components/ui/Card';
 import { Spinner } from '../../components/ui/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -10,6 +11,7 @@ import { motion } from 'framer-motion';
 export default function Dashboard() {
   const { data: overview, isLoading, isError, refetch } = useOverview();
   const { data: topArtists } = useTopArtists();
+  const { data: dailyStats } = useDailyStats(7);
 
   if (isLoading) {
     return (
@@ -32,6 +34,8 @@ export default function Dashboard() {
   const formatHours = (ms) => (ms / (1000 * 60 * 60)).toFixed(1);
   const { listening } = overview;
   const favoriteArtist = topArtists?.[0];
+  const activityDays = dailyStats || [];
+  const maxDailySongs = Math.max(...activityDays.map((day) => day.listening?.totalSongs || 0), 0);
 
   const statCards = [
     { title: 'Total Listening Time', value: `${formatHours(listening.totalMs)}h`, icon: Clock, color: 'text-blue-400', bg: 'bg-blue-400/10' },
@@ -89,10 +93,36 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Future Chart Placeholder */}
-        <Card className="col-span-1 lg:col-span-2 flex flex-col justify-center items-center min-h-[300px]">
-          <BarChart2 size={48} className="text-beatly-border mb-4" />
-          <p className="text-beatly-text-muted font-semibold">Activity Chart Comming in Analytics Tab</p>
+        <Card className="col-span-1 lg:col-span-2 flex flex-col min-h-[300px]">
+          <div className="flex items-center gap-3 mb-6">
+            <BarChart2 size={24} className="text-beatly-primary" />
+            <h3 className="text-lg font-bold">Recent Activity</h3>
+          </div>
+          {activityDays.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center text-center text-beatly-text-muted font-semibold">
+              Sync your Spotify history to see recent listening activity.
+            </div>
+          ) : (
+            <div className="flex-1 flex items-end gap-3">
+              {activityDays.map((day) => {
+                const songs = day.listening?.totalSongs || 0;
+                const height = maxDailySongs > 0 ? Math.max(8, (songs / maxDailySongs) * 100) : 8;
+                return (
+                  <div key={day._id || day.periodStart} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="w-full h-40 flex items-end">
+                      <div
+                        className="w-full rounded-t-lg bg-beatly-primary/80"
+                        style={{ height: `${height}%` }}
+                      />
+                    </div>
+                    <span className="text-xs font-bold text-beatly-text-muted">
+                      {new Date(day.periodStart).toLocaleDateString(undefined, { weekday: 'short' })}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </div>
     </div>

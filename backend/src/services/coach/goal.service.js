@@ -38,8 +38,7 @@ export const goalService = {
     if (frequency === 'Weekly') deadline.setDate(deadline.getDate() + (7 - deadline.getDay()));
     if (frequency === 'Monthly') deadline.setMonth(deadline.getMonth() + 1, 0);
 
-    // 4. Generate AI Reason (mocked for speed, could integrate Ollama here)
-    // "Your average is 24 songs/day."
+    // 4. Generate a lightweight reason from the selected goal template.
     let aiReason = `This ${frequency.toLowerCase()} goal aligns with your recent listening patterns.`;
     if (template.category === 'Listening Time') {
       aiReason = `Based on your recent listening, reaching ${template.target} ${template.unit} will push your average up.`;

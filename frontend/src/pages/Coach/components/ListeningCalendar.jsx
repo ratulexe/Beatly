@@ -22,7 +22,7 @@ const ListeningCalendar = ({ data = [], filter = 'Listening Time' }) => {
           <p className="text-gray-400 text-sm">Your daily consistency over the last 6 months</p>
         </div>
         <div className="flex gap-2">
-          {['Songs', 'Minutes', 'Goals'].map(tab => (
+          {['Songs', 'Minutes'].map(tab => (
             <button 
               key={tab} 
               onClick={() => setActiveFilter(tab)}
@@ -58,9 +58,6 @@ const ListeningCalendar = ({ data = [], filter = 'Listening Time' }) => {
                   } else if (activeFilter === 'Minutes') {
                     val = d.minutes || 0;
                     displayStr = `${val} Minutes Listened`;
-                  } else {
-                    val = d.count ? 1 : 0; // Mock goal completion based on activity
-                    displayStr = val > 0 ? `1 Goal Completed` : `0 Goals Completed`;
                   }
                 }
                 
@@ -71,8 +68,6 @@ const ListeningCalendar = ({ data = [], filter = 'Listening Time' }) => {
                   if (val > 30) level = 2;
                   if (val > 60) level = 3;
                   if (val > 120) level = 4;
-                } else if (activeFilter === 'Goals') {
-                  level = val > 0 ? 4 : 0;
                 } else {
                   level = getLevel(val);
                 }
@@ -85,7 +80,7 @@ const ListeningCalendar = ({ data = [], filter = 'Listening Time' }) => {
                   'bg-beatly-primary', // 4
                 ];
 
-                const dateStr = d ? new Date(d.date).toLocaleDateString() : `Historical Day`;
+                const dateStr = d ? new Date(d.date).toLocaleDateString() : 'No date';
 
                 return (
                   <div key={rowIndex} className="relative">
@@ -121,7 +116,7 @@ const ListeningCalendar = ({ data = [], filter = 'Listening Time' }) => {
             >
               <div className="text-gray-400 text-xs font-bold uppercase mb-2">{hoveredCell.dateStr}</div>
               <div className="text-white font-bold text-lg mb-1">{hoveredCell.displayStr}</div>
-              {hoveredCell.val > 0 && activeFilter !== 'Goals' && (
+              {hoveredCell.val > 0 && (
                 <div className="flex items-center gap-2 text-beatly-primary text-sm font-bold mt-2">
                   ✓ Active Day
                 </div>

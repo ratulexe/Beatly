@@ -11,7 +11,7 @@ class CacheService {
       this.cache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
       logger.info('CacheService initialized with memory driver');
     } else if (this.driver === 'redis') {
-      logger.info('CacheService initialized with redis driver (mocked for future implementation)');
+      logger.info('CacheService initialized with redis driver pending implementation');
       // Future: Initialize ioredis client here
     } else {
       logger.warn(`Unknown cache driver: ${this.driver}. Falling back to memory.`);

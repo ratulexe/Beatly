@@ -1,29 +1,22 @@
-import { useState, useEffect } from 'react';
-import { Trophy, Clock, Target, Calendar } from 'lucide-react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Trophy, Clock, Calendar } from 'lucide-react';
 import PageHeader from '../../components/common/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { api } from '../../services/apiClient';
+import { ErrorState } from '../../components/ui/ErrorState';
 
 const Leaderboard = () => {
-  const [leaderboard, setLeaderboard] = useState(null);
   const [type, setType] = useState('allTime'); // daily, weekly, monthly, allTime
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchLeaderboard();
-  }, [type]);
+  const leaderboardQuery = useQuery({
+    queryKey: ['leaderboard', 'global', type],
+    queryFn: () => api.get(`/api/leaderboards/global?type=${type}`),
+    staleTime: 5 * 60 * 1000,
+    retry: 1
+  });
 
-  const fetchLeaderboard = async () => {
-    try {
-      setLoading(true);
-      const data = await api.get(`/api/leaderboards/global?type=${type}`);
-      setLeaderboard(data);
-    } catch (error) {
-      console.error('Failed to fetch leaderboard', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const leaderboard = leaderboardQuery.data;
 
   const tabs = [
     { id: 'daily', label: 'Daily', icon: <Clock size={16} /> },
@@ -58,10 +51,16 @@ const Leaderboard = () => {
       </div>
 
       <Card>
-        {loading ? (
+        {leaderboardQuery.isLoading ? (
           <div className="flex justify-center p-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-beatly-primary"></div>
           </div>
+        ) : leaderboardQuery.isError ? (
+          <ErrorState
+            title="Failed to load leaderboard"
+            message="Beatly could not load the leaderboard right now."
+            onRetry={leaderboardQuery.refetch}
+          />
         ) : (
           <div className="space-y-4">
             {leaderboard?.rankings?.length > 0 ? (

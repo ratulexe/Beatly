@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../../services/apiClient';
 import DeviceStatus from '../../../components/sync/DeviceStatus';
 import LastSyncBadge from '../../../components/sync/LastSyncBadge';
@@ -9,40 +10,53 @@ import toast from 'react-hot-toast';
 const DeviceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [device, setDevice] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState('');
 
-  useEffect(() => {
-    const fetchDevice = async () => {
-      try {
-        const response = await api.get('/api/devices');
-        const devicesArray = Array.isArray(response) ? response : (response.devices || response.data || []);
-        const found = devicesArray.find(d => d._id === id);
-        if (found) {
-          setDevice(found);
-          setEditName(found.deviceName);
-        } else {
-          setError('Device not found');
-        }
-      } catch (err) {
-        setError('Failed to load device details');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const deviceQuery = useQuery({
+    queryKey: ['devices'],
+    queryFn: async () => {
+      const response = await api.get('/api/devices');
+      return Array.isArray(response) ? response : (response.devices || response.data || []);
+    },
+    staleTime: 60 * 1000,
+    retry: 1
+  });
 
-    fetchDevice();
-  }, [id]);
+  const device = deviceQuery.data?.find(d => d._id === id);
+
+  const renameDeviceMutation = useMutation({
+    mutationFn: () => api.patch(`/api/devices/${id}`, { deviceName: editName }),
+    onSuccess: (updatedDevice) => {
+      queryClient.setQueryData(['devices'], (devices = []) => devices.map((item) => (
+        item._id === updatedDevice._id ? updatedDevice : item
+      )));
+      setIsEditing(false);
+      toast.success('Device renamed successfully');
+    },
+    onError: () => toast.error('Failed to rename device')
+  });
+
+  const removeDeviceMutation = useMutation({
+    mutationFn: () => api.delete(`/api/devices/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['devices'] });
+      toast.success('Device removed successfully');
+      navigate('/settings/devices');
+    },
+    onError: () => toast.error('Failed to remove device')
+  });
+
+  const startEditing = () => {
+    setEditName(device.deviceName);
+    setIsEditing(true);
+  };
 
   const handleRemove = async () => {
     if (window.confirm('Are you sure you want to remove this device? This will log it out immediately.')) {
       try {
-        await api.delete(`/api/devices/${id}`);
-        toast.success('Device removed successfully');
-        navigate('/settings/devices');
+        removeDeviceMutation.mutate();
       } catch (err) {
         toast.error('Failed to remove device');
       }
@@ -50,19 +64,12 @@ const DeviceDetails = () => {
   };
 
   const handleSaveRename = async () => {
-    try {
-      const response = await api.patch(`/api/devices/${id}`, { deviceName: editName });
-      setDevice(response);
-      setIsEditing(false);
-      toast.success('Device renamed successfully');
-    } catch (err) {
-      toast.error('Failed to rename device');
-    }
+    renameDeviceMutation.mutate();
   };
 
-  if (loading) return <div className="text-gray-400">Loading device details...</div>;
-  if (error) return <div className="text-red-400">{error}</div>;
-  if (!device) return null;
+  if (deviceQuery.isLoading) return <div className="text-gray-400">Loading device details...</div>;
+  if (deviceQuery.isError) return <div className="text-red-400">Failed to load device details</div>;
+  if (!device) return <div className="text-red-400">Device not found</div>;
 
   return (
     <div className="max-w-3xl mx-auto pb-20">
@@ -104,13 +111,13 @@ const DeviceDetails = () => {
                     className="text-2xl font-bold bg-gray-900 border border-gray-700 rounded-lg px-3 py-1 text-white focus:outline-none focus:border-beatly-primary w-full max-w-sm"
                     autoFocus
                   />
-                  <button onClick={handleSaveRename} className="bg-beatly-primary text-black px-4 py-1.5 rounded-lg font-bold text-sm hover:opacity-90">Save</button>
+                  <button onClick={handleSaveRename} disabled={renameDeviceMutation.isPending} className="bg-beatly-primary text-black px-4 py-1.5 rounded-lg font-bold text-sm hover:opacity-90 disabled:opacity-60">Save</button>
                   <button onClick={() => { setIsEditing(false); setEditName(device.deviceName); }} className="text-gray-400 hover:text-white px-3 py-1.5 text-sm font-bold">Cancel</button>
                 </div>
               ) : (
                 <div className="flex items-center gap-3 mb-2">
                   <h2 className="text-3xl font-bold text-white">{device.deviceName}</h2>
-                  <button onClick={() => setIsEditing(true)} className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition" title="Rename Device">
+                  <button onClick={startEditing} className="p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition" title="Rename Device">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                   </button>
                 </div>

@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Compass, Sparkles, Flame, Play, Info, Flame as FlameIcon, Search } from 'lucide-react';
 import { api } from '../../services/apiClient';
+import { ErrorState } from '../../components/ui/ErrorState';
 
 import DiscoveryScore from './components/ui/DiscoveryScore';
 import GenreMap from './components/ui/GenreMap';
@@ -79,25 +81,25 @@ const RecommendationCard = ({ rec, onWhyClick }) => {
 };
 
 const DiscoverDashboard = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [selectedRec, setSelectedRec] = useState(null);
 
-  useEffect(() => {
-    const fetchDiscover = async () => {
-      try {
-        const res = await api.get('/api/discover');
-        setData(res.data);
-      } catch (err) {
-        console.error('Failed to load discover data', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDiscover();
-  }, []);
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch
+  } = useQuery({
+    queryKey: ['discover', 'dashboard'],
+    queryFn: async () => {
+      const res = await api.get('/api/discover');
+      return res.data;
+    },
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: 1
+  });
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full p-20 space-y-4">
         <div className="w-12 h-12 border-4 border-beatly-primary border-t-transparent rounded-full animate-spin" />
@@ -106,10 +108,19 @@ const DiscoverDashboard = () => {
     );
   }
 
+  if (isError) {
+    return (
+      <ErrorState
+        title="Failed to load Discover"
+        message="Beatly could not load your discovery recommendations yet."
+        onRetry={refetch}
+      />
+    );
+  }
+
   return (
     <div className="p-4 md:p-8 space-y-12 pb-32 max-w-7xl mx-auto">
       
-      {/* Universal Search Mock */}
       <div className="relative max-w-2xl mx-auto mb-8 z-40">
         <div className="relative group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors" size={20} />
@@ -118,20 +129,6 @@ const DiscoverDashboard = () => {
             placeholder="Search Artists, Albums, Genres, or your Smart Collections..." 
             className="w-full bg-beatly-surface border border-white/10 rounded-full py-3 pl-12 pr-6 text-white placeholder-gray-500 focus:outline-none focus:border-purple-400 transition-all shadow-xl peer"
           />
-          {/* Mock Autocomplete Dropdown */}
-          <div className="absolute top-full left-0 right-0 mt-2 bg-beatly-surface border border-white/10 rounded-2xl shadow-2xl overflow-hidden opacity-0 invisible peer-focus:opacity-100 peer-focus:visible transition-all pointer-events-none peer-focus:pointer-events-auto">
-            <div className="p-2">
-              <div className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Top Results</div>
-              <div className="px-3 py-2 hover:bg-white/5 rounded-xl cursor-pointer flex items-center gap-3">
-                <div className="w-8 h-8 rounded bg-purple-500/20 flex items-center justify-center text-purple-400 font-bold">A</div>
-                <div className="text-sm font-medium text-white">Arctic Monkeys <span className="text-gray-500 text-xs ml-2">Artist</span></div>
-              </div>
-              <div className="px-3 py-2 hover:bg-white/5 rounded-xl cursor-pointer flex items-center gap-3">
-                <div className="w-8 h-8 rounded bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold">C</div>
-                <div className="text-sm font-medium text-white">Currents <span className="text-gray-500 text-xs ml-2">Album</span></div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -151,17 +148,17 @@ const DiscoverDashboard = () => {
           </div>
           <div className="flex items-center gap-6 text-center">
             <div>
-              <div className="text-2xl font-black text-white">{data.streak.counts?.artists || 14}</div>
+              <div className="text-2xl font-black text-white">{data.streak.counts?.artists || 0}</div>
               <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Artists</div>
             </div>
             <div className="w-px h-8 bg-white/10" />
             <div>
-              <div className="text-2xl font-black text-white">{data.streak.counts?.albums || 6}</div>
+              <div className="text-2xl font-black text-white">{data.streak.counts?.albums || 0}</div>
               <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Albums</div>
             </div>
             <div className="w-px h-8 bg-white/10" />
             <div>
-              <div className="text-2xl font-black text-white">{data.streak.counts?.genres || 3}</div>
+              <div className="text-2xl font-black text-white">{data.streak.counts?.genres || 0}</div>
               <div className="text-xs text-gray-400 font-bold uppercase tracking-wider">Genres</div>
             </div>
           </div>

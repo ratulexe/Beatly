@@ -25,8 +25,6 @@ export const useProfile = () => {
     }
   });
 
-  console.log('[useProfile] profileQuery data:', profileQuery.data, 'isError:', profileQuery.isError, 'isPending:', profileQuery.isPending, 'isFetching:', profileQuery.isFetching);
-
   return {
     profile: profileQuery.data,
     isLoading: profileQuery.isPending,

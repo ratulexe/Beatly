@@ -2,11 +2,14 @@ import { goalService } from './goal.service.js';
 import { challengeService } from './challenge.service.js';
 import { habitService } from './habit.service.js';
 import { analyticsRepository } from '../database/analyticsRepository.js';
+import { User } from '../../models/User.model.js';
+import { rankingService } from '../ranking/ranking.service.js';
 
 export const coachService = {
   async getDashboard(userId) {
     // Aggregates everything for the dashboard UI
     const analytics = await analyticsRepository.getLatestSnapshot(userId, 'overall');
+    const user = await User.findById(userId).select('xp currentStreak longestStreak').lean();
     const goals = await goalService.getActiveGoals(userId);
     const habits = await habitService.detectHabits(userId); // Or getHabits to be faster
     
@@ -22,8 +25,9 @@ export const coachService = {
       aiSuggestion = `Based on your listening, you're close to becoming a ${habits[0].habit}. Keep it up!`;
     }
 
-    // Mocking current streak (this would come from Analytics/User model)
-    const currentStreak = 12;
+    const xp = user?.xp || 0;
+    const level = rankingService.calculateLevel(xp);
+    const nextLevelXp = rankingService.xpForNextLevel(level);
 
     // Get today's snapshot for accurate daily count and sync time
     const today = new Date();
@@ -35,7 +39,12 @@ export const coachService = {
     const lastSyncedAt = todaySnapshot?.generatedAt || null;
 
     return {
-      streak: currentStreak,
+      userId: userId.toString(),
+      streak: user?.currentStreak || 0,
+      longestStreak: user?.longestStreak || 0,
+      xp,
+      level,
+      nextLevelXp,
       goals,
       habits,
       aiSuggestion,

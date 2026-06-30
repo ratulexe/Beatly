@@ -2,10 +2,13 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Users, Clock, ArrowRight, Trophy, Coins } from 'lucide-react';
 
-const ChallengeCard = ({ challenge, index = 0, onJoin }) => {
-  const isJoined = challenge.participants?.some(p => p.userId === 'current_user_id_mock'); // Ideally check real ID
+const ChallengeCard = ({ challenge, currentUserId, index = 0, onJoin, isJoining = false }) => {
+  const participant = challenge.participants?.find((p) => String(p.userId?._id || p.userId) === String(currentUserId));
+  const isJoined = Boolean(participant);
   const daysLeft = Math.ceil((new Date(challenge.endDate) - new Date()) / (1000 * 60 * 60 * 24));
-  const progressPercentage = isJoined ? 45 : 0; // Mock progress
+  const progressPercentage = challenge.target > 0
+    ? Math.min(100, Math.round(((participant?.progress || 0) / challenge.target) * 100))
+    : 0;
   
   return (
     <motion.div 
@@ -33,10 +36,10 @@ const ChallengeCard = ({ challenge, index = 0, onJoin }) => {
 
       <div className="flex gap-4 relative z-10">
         <div className="bg-white/5 px-3 py-1.5 rounded-xl border border-white/5 flex items-center gap-1.5 text-xs font-bold">
-          <Trophy size={14} className="text-yellow-400" /> <span className="text-white">+500 XP</span>
+          <Trophy size={14} className="text-yellow-400" /> <span className="text-white">+{challenge.xpReward || 0} XP</span>
         </div>
         <div className="bg-white/5 px-3 py-1.5 rounded-xl border border-white/5 flex items-center gap-1.5 text-xs font-bold">
-          <Coins size={14} className="text-beatly-primary" /> <span className="text-white">+100 Coins</span>
+          <Coins size={14} className="text-beatly-primary" /> <span className="text-white">+{challenge.coinReward || 0} Coins</span>
         </div>
       </div>
 
@@ -66,10 +69,11 @@ const ChallengeCard = ({ challenge, index = 0, onJoin }) => {
             </button>
           ) : (
             <button 
+              disabled={isJoining}
               onClick={() => onJoin(challenge._id)}
-              className="w-full bg-purple-500 hover:bg-purple-400 text-white px-6 py-2.5 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-purple-500 hover:bg-purple-400 disabled:opacity-60 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-full font-bold text-sm transition-colors flex items-center justify-center gap-2"
             >
-              Join Challenge <ArrowRight size={16} />
+              {isJoining ? 'Joining...' : 'Join Challenge'} <ArrowRight size={16} />
             </button>
           )}
         </div>

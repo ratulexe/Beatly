@@ -14,5 +14,10 @@ export const groupApi = {
   createGroup: async (groupData) => {
     const response = await api.post('/api/groups', groupData);
     return response;
+  },
+
+  removeMember: async (groupId, userId) => {
+    const response = await api.delete(`/api/groups/${groupId}/members/${userId}`);
+    return response;
   }
 };

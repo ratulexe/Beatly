@@ -1,9 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Award, Lock, Star } from 'lucide-react';
+import { Award } from 'lucide-react';
 
-const RewardsSection = ({ xp = 1250 }) => {
-  const nextTarget = 2000;
+const RewardsSection = ({ dashboard }) => {
+  const xp = dashboard?.xp || 0;
+  const level = dashboard?.level || 1;
+  const nextTarget = dashboard?.nextLevelXp || 100;
   const percentage = Math.round((xp / nextTarget) * 100);
 
   return (
@@ -18,7 +20,7 @@ const RewardsSection = ({ xp = 1250 }) => {
         </div>
         <div>
           <h3 className="font-bold text-white text-lg">Rewards Journey</h3>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Level 4 Listener</p>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Level {level} Listener</p>
         </div>
       </div>
 
@@ -42,32 +44,8 @@ const RewardsSection = ({ xp = 1250 }) => {
         </p>
       </div>
 
-      <div className="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#111] border border-white/10 flex items-center justify-center">
-            <Lock className="text-gray-500" size={16} />
-          </div>
-          <div>
-            <h4 className="font-bold text-white text-sm">Music Maestro Title</h4>
-            <p className="text-gray-400 text-xs">Profile Badge</p>
-          </div>
-        </div>
-        <div className="text-xs font-bold text-gray-500 uppercase">Next Unlock</div>
-      </div>
-
-      <div className="bg-white/5 p-4 rounded-2xl border border-white/5 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-beatly-primary/20 border border-beatly-primary/50 flex items-center justify-center">
-            <Star className="text-beatly-primary" size={16} />
-          </div>
-          <div>
-            <h4 className="font-bold text-white text-sm">Dedicated Listener</h4>
-            <p className="text-beatly-primary text-xs">Active Title</p>
-          </div>
-        </div>
-        <button className="text-xs font-bold text-white bg-white/10 px-3 py-1 rounded-full hover:bg-white/20 transition-colors">
-          Equip
-        </button>
+      <div className="bg-white/5 p-4 rounded-2xl border border-white/5 text-sm text-gray-400">
+        Earn XP from achievements and goals to unlock your next level.
       </div>
     </motion.div>
   );

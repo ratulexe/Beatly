@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Target, Activity, ShieldAlert, Zap, Award } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { coachApi } from '../../services/api/coachApi';
+import { ErrorState } from '../../components/ui/ErrorState';
 import ListeningCalendar from './components/ListeningCalendar';
 import ChallengeCard from './components/ChallengeCard';
 import HeroSection from './components/HeroSection';
@@ -13,30 +15,51 @@ import AIPersonalityCard from './components/AIPersonalityCard';
 import RewardsSection from './components/RewardsSection';
 
 const CoachDashboard = () => {
-  const [dashboard, setDashboard] = useState(null);
-  const [calendarData, setCalendarData] = useState([]);
-  const [challenges, setChallenges] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchDashboard = async () => {
-      try {
-        const [res, calRes, chalRes] = await Promise.all([
-          coachApi.getDashboard(),
-          coachApi.getCalendar(),
-          coachApi.getChallenges()
-        ]);
-        setDashboard(res.data);
-        setCalendarData(calRes.data);
-        setChallenges(chalRes.data);
-      } catch (error) {
-        console.error('Failed to load coach dashboard', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchDashboard();
-  }, []);
+  const dashboardQuery = useQuery({
+    queryKey: ['coach', 'dashboard'],
+    queryFn: async () => {
+      const res = await coachApi.getDashboard();
+      return res.data;
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1
+  });
+
+  const calendarQuery = useQuery({
+    queryKey: ['coach', 'calendar'],
+    queryFn: async () => {
+      const res = await coachApi.getCalendar();
+      return res.data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1
+  });
+
+  const challengesQuery = useQuery({
+    queryKey: ['coach', 'challenges'],
+    queryFn: async () => {
+      const res = await coachApi.getChallenges();
+      return res.data || [];
+    },
+    staleTime: 5 * 60 * 1000,
+    retry: 1
+  });
+
+  const joinChallengeMutation = useMutation({
+    mutationFn: coachApi.joinChallenge,
+    onSuccess: () => {
+      toast.success('Challenge joined');
+      queryClient.invalidateQueries({ queryKey: ['coach', 'challenges'] });
+    },
+    onError: () => {
+      toast.error('Failed to join challenge');
+    }
+  });
+
+  const loading = dashboardQuery.isLoading || calendarQuery.isLoading || challengesQuery.isLoading;
+  const hasError = dashboardQuery.isError || calendarQuery.isError || challengesQuery.isError;
 
   if (loading) {
     return (
@@ -53,6 +76,23 @@ const CoachDashboard = () => {
     );
   }
 
+  if (hasError) {
+    return (
+      <ErrorState
+        title="Failed to load Beatly Coach"
+        message="Coach data could not be loaded. Please try again after syncing your tracks."
+        onRetry={() => {
+          dashboardQuery.refetch();
+          calendarQuery.refetch();
+          challengesQuery.refetch();
+        }}
+      />
+    );
+  }
+
+  const dashboard = dashboardQuery.data;
+  const calendarData = calendarQuery.data || [];
+  const challenges = challengesQuery.data || [];
   const { goals, habits, aiSuggestion } = dashboard || {};
 
   return (
@@ -90,8 +130,20 @@ const CoachDashboard = () => {
             </h2>
             <div className={`grid grid-cols-1 ${challenges?.length > 1 ? 'sm:grid-cols-2' : ''} gap-4`}>
               {challenges?.map((chal, i) => (
-                <ChallengeCard key={chal._id} challenge={chal} index={i} onJoin={(id) => toast.success(`Joined Challenge: ${id}`)} />
+                <ChallengeCard
+                  key={chal._id}
+                  challenge={chal}
+                  currentUserId={dashboard?.userId}
+                  index={i}
+                  onJoin={(id) => joinChallengeMutation.mutate(id)}
+                  isJoining={joinChallengeMutation.isPending}
+                />
               ))}
+              {challenges?.length === 0 && (
+                <div className="text-gray-500 italic p-6 bg-white/5 rounded-2xl border border-white/5 text-center">
+                  No active community challenges right now.
+                </div>
+              )}
             </div>
           </section>
         </div>
@@ -109,7 +161,7 @@ const CoachDashboard = () => {
             <h2 className="text-2xl font-bold text-white flex items-center gap-2 mb-6">
               <Award className="text-yellow-400" /> Rewards & Progression
             </h2>
-            <RewardsSection />
+            <RewardsSection dashboard={dashboard} />
           </section>
         </div>
 

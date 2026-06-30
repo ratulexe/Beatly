@@ -37,11 +37,15 @@ const AIPickHero = ({ pick, onWhyClick }) => {
         
         {/* Left Side: Artwork */}
         <div className="relative group w-64 h-64 flex-shrink-0">
-          <img 
-            src={pick.entityImage || 'https://via.placeholder.com/256'} 
-            alt={pick.entityName} 
-            className="w-full h-full object-cover rounded-3xl shadow-2xl shadow-purple-900/20"
-          />
+          {pick.entityImage ? (
+            <img
+              src={pick.entityImage}
+              alt={pick.entityName}
+              className="w-full h-full object-cover rounded-3xl shadow-2xl shadow-purple-900/20"
+            />
+          ) : (
+            <div className="w-full h-full rounded-3xl bg-white/5 border border-white/10 shadow-2xl shadow-purple-900/20" />
+          )}
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl flex items-center justify-center">
             <button 
               onClick={togglePlay}

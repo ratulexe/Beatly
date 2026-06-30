@@ -55,10 +55,16 @@ const NowPlaying = ({ data }) => {
       </div>
 
       <div style={styles.body}>
-        <img loading="lazy" src={track.album?.image || 'https://via.placeholder.com/80'} 
-          alt={track.album?.name || 'Album art'}
-          style={styles.albumArt}
-        />
+        {track.album?.image ? (
+          <img loading="lazy" src={track.album.image}
+            alt={track.album?.name || 'Album art'}
+            style={styles.albumArt}
+          />
+        ) : (
+          <div style={styles.albumArtFallback}>
+            <Music size={28} />
+          </div>
+        )}
         <div style={styles.info}>
           <h3 style={styles.trackName}>{track.name}</h3>
           <p style={styles.artistName}>
@@ -123,6 +129,17 @@ const styles = {
     height: '72px',
     borderRadius: '10px',
     objectFit: 'cover',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+  },
+  albumArtFallback: {
+    width: '72px',
+    height: '72px',
+    borderRadius: '10px',
+    background: 'rgba(255, 255, 255, 0.08)',
+    color: '#888',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
   },
   info: {

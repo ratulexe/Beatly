@@ -1,50 +1,51 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Sparkles, Zap, User, Music, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { aiApi } from '../../services/api/aiApi';
-import DashboardLayout from '../../layouts/DashboardLayout';
-import ReactMarkdown from 'react-markdown';
 
 const AIHub = () => {
-  const [data, setData] = useState({
-    insights: null,
-    recommendations: null,
-    personality: null,
-    predictions: null
+  const insightsQuery = useQuery({
+    queryKey: ['ai', 'insights'],
+    queryFn: async () => {
+      const res = await aiApi.getInsights();
+      return res.data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 1
   });
-  // We'll track loading per card now
-  const [loading, setLoading] = useState({
-    insights: true,
-    recommendations: true,
-    personality: true,
-    predictions: true
+
+  const recommendationsQuery = useQuery({
+    queryKey: ['ai', 'recommendations'],
+    queryFn: async () => {
+      const res = await aiApi.getRecommendations();
+      return res.data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 1
   });
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    // Fetch independently so the page doesn't block for 5 minutes waiting on Ollama queue
-    aiApi.getInsights()
-      .then(res => setData(prev => ({ ...prev, insights: res.data })))
-      .catch(() => setData(prev => ({ ...prev, insights: [] })))
-      .finally(() => setLoading(prev => ({ ...prev, insights: false })));
+  const personalityQuery = useQuery({
+    queryKey: ['ai', 'personality'],
+    queryFn: async () => {
+      const res = await aiApi.getPersonality();
+      return res.data;
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 1
+  });
 
-    aiApi.getRecommendations()
-      .then(res => setData(prev => ({ ...prev, recommendations: res.data })))
-      .catch(() => setData(prev => ({ ...prev, recommendations: [] })))
-      .finally(() => setLoading(prev => ({ ...prev, recommendations: false })));
+  const predictionsQuery = useQuery({
+    queryKey: ['ai', 'predictions'],
+    queryFn: async () => {
+      const res = await aiApi.getPredictions();
+      return res.data || [];
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: 1
+  });
 
-    aiApi.getPersonality()
-      .then(res => setData(prev => ({ ...prev, personality: res.data })))
-      .catch(() => setData(prev => ({ ...prev, personality: null })))
-      .finally(() => setLoading(prev => ({ ...prev, personality: false })));
-
-    aiApi.getPredictions()
-      .then(res => setData(prev => ({ ...prev, predictions: res.data })))
-      .catch(() => setData(prev => ({ ...prev, predictions: [] })))
-      .finally(() => setLoading(prev => ({ ...prev, predictions: false })));
-  }, []);
-
-  const isLoadingAny = Object.values(loading).every(Boolean);
+  const isLoadingAny = insightsQuery.isLoading && recommendationsQuery.isLoading && personalityQuery.isLoading && predictionsQuery.isLoading;
 
   if (isLoadingAny) {
     return (
@@ -56,15 +57,10 @@ const AIHub = () => {
     );
   }
 
-  if (error) {
-    return (
-      <div className="bg-beatly-error/10 text-beatly-error p-6 rounded-xl text-center">
-        {error}
-      </div>
-    );
-  }
-
-  const { insights, recommendations, personality, predictions } = data;
+  const insights = insightsQuery.data || [];
+  const recommendations = recommendationsQuery.data || [];
+  const personality = personalityQuery.data;
+  const predictions = predictionsQuery.data || [];
 
   return (
     <div className="space-y-8 pb-12">
@@ -84,9 +80,13 @@ const AIHub = () => {
         {/* Left Column: Personality & Predictions */}
         <div className="space-y-6 lg:col-span-1">
           {/* Personality Card */}
-          {loading.personality ? (
+          {personalityQuery.isLoading ? (
             <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border animate-pulse h-64"></div>
-          ) : personality && (
+          ) : personalityQuery.isError ? (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Listening personality is unavailable right now.
+            </div>
+          ) : personality ? (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -113,12 +113,20 @@ const AIHub = () => {
                 </div>
               )}
             </motion.div>
+          ) : (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Sync more listening history to unlock your listening personality.
+            </div>
           )}
 
           {/* Predictions Card */}
-          {loading.predictions ? (
+          {predictionsQuery.isLoading ? (
             <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border animate-pulse h-48"></div>
-          ) : predictions && predictions.length > 0 && (
+          ) : predictionsQuery.isError ? (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Future predictions are unavailable right now.
+            </div>
+          ) : predictions && predictions.length > 0 ? (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -137,15 +145,23 @@ const AIHub = () => {
                 ))}
               </ul>
             </motion.div>
+          ) : (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Predictions will appear after Beatly has enough listening history.
+            </div>
           )}
         </div>
 
         {/* Right Column: Insights & Recommendations */}
         <div className="space-y-6 lg:col-span-2">
           {/* Insights Card */}
-          {loading.insights ? (
+          {insightsQuery.isLoading ? (
             <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border animate-pulse h-64"></div>
-          ) : insights && insights.length > 0 && (
+          ) : insightsQuery.isError ? (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Insights are unavailable right now.
+            </div>
+          ) : insights && insights.length > 0 ? (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -165,12 +181,20 @@ const AIHub = () => {
                 ))}
               </div>
             </motion.div>
+          ) : (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              Insights will appear after your listening analytics are available.
+            </div>
           )}
 
           {/* Recommendations Card */}
-          {loading.recommendations ? (
+          {recommendationsQuery.isLoading ? (
             <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border animate-pulse h-64"></div>
-          ) : recommendations && recommendations.length > 0 && (
+          ) : recommendationsQuery.isError ? (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              AI recommendations are unavailable right now.
+            </div>
+          ) : recommendations && recommendations.length > 0 ? (
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -195,6 +219,10 @@ const AIHub = () => {
                 ))}
               </div>
             </motion.div>
+          ) : (
+            <div className="bg-beatly-surface p-6 rounded-2xl border border-beatly-border text-gray-400">
+              AI recommendations will appear after Beatly analyzes your taste.
+            </div>
           )}
         </div>
       </div>

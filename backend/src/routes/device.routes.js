@@ -16,6 +16,11 @@ const validate = (validations) => async (req, res, next) => {
   next();
 };
 
+const destroySessionById = (req, sessionId) => new Promise((resolve, reject) => {
+  if (!sessionId || !req.sessionStore?.destroy) return resolve();
+  req.sessionStore.destroy(sessionId, (error) => (error ? reject(error) : resolve()));
+});
+
 router.get('/', async (req, res) => {
   try {
     const devices = await deviceService.getDevices(req.user.id);
@@ -31,7 +36,10 @@ router.post('/register', validate([
   body('platform').trim().notEmpty().withMessage('Platform is required'),
 ]), async (req, res) => {
   try {
-    const device = await deviceService.registerDevice(req.user.id, req.body);
+    const device = await deviceService.registerDevice(req.user.id, {
+      ...req.body,
+      sessionId: req.sessionID
+    });
     res.json({ device, sessionId: device.sessionId });
   } catch (error) {
     console.error('Failed to register device:', error);
@@ -68,6 +76,7 @@ router.delete('/:id', async (req, res) => {
     
     // Emit force_logout event to the targeted device
     forceLogoutDevice(req.params.id);
+    await destroySessionById(req, device.sessionId);
     
     res.json({ success: true });
   } catch (error) {

@@ -3,12 +3,12 @@ import { motion, animate } from 'framer-motion';
 import { Target, TrendingUp } from 'lucide-react';
 
 const DiscoveryScore = ({ scoreData }) => {
-  const { score = 86, description = 'Excellent Explorer', details = "You've discovered 24 new artists this month.", previousScore = 74 } = scoreData || {};
+  const { score = 0, description = 'New Explorer', details = 'Start listening to discover new music.', previousScore = 0 } = scoreData || {};
   const difference = score - previousScore;
-  const [displayScore, setDisplayScore] = useState(score - 14);
+  const [displayScore, setDisplayScore] = useState(0);
 
   useEffect(() => {
-    const controls = animate(score - 14, score, {
+    const controls = animate(0, score, {
       duration: 1.5,
       ease: "easeOut",
       onUpdate(value) {

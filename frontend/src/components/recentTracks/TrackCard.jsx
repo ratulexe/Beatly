@@ -1,5 +1,6 @@
 import React, { memo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { Music } from 'lucide-react';
 
 const formatDuration = (ms) => {
   const minutes = Math.floor(ms / 60000);
@@ -17,10 +18,16 @@ const TrackCard = memo(({ item }) => {
 
   return (
     <div className="track-card glass-panel" style={styles.card}>
-      <img loading="lazy" src={album?.image || 'https://via.placeholder.com/60'} 
-        alt={album?.name || 'Album cover'} 
-        style={styles.image}
-      />
+      {album?.image ? (
+        <img loading="lazy" src={album.image}
+          alt={album?.name || 'Album cover'}
+          style={styles.image}
+        />
+      ) : (
+        <div style={styles.imageFallback}>
+          <Music size={22} />
+        </div>
+      )}
       <div style={styles.info}>
         <h4 style={styles.title}>{track.name}</h4>
         <p style={styles.subtitle}>
@@ -52,6 +59,17 @@ const styles = {
     borderRadius: '8px',
     objectFit: 'cover',
     marginRight: '16px',
+  },
+  imageFallback: {
+    width: '60px',
+    height: '60px',
+    borderRadius: '8px',
+    marginRight: '16px',
+    background: 'rgba(255, 255, 255, 0.08)',
+    color: '#777',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   info: {
     flex: 1,

@@ -32,7 +32,7 @@ export const discoveryMetricsService = {
       };
     } catch (e) {
       logger.error('Failed to calculate score', e);
-      return { score: 86, description: "Excellent Explorer", details: "You've discovered 24 new artists this month." };
+      return { score: 0, description: "New Explorer", details: "Start listening to discover new music." };
     }
   },
 
@@ -108,7 +108,7 @@ export const discoveryMetricsService = {
         return {
           year: relativeTime,
           label: event.message,
-          image: event.entityImage || 'https://picsum.photos/seed/music/150/150'
+          image: event.entityImage
         };
       });
     } catch (e) {

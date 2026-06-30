@@ -7,6 +7,11 @@ const router = express.Router();
 
 router.use(requireAuth);
 
+const destroySessionById = (req, sessionId) => new Promise((resolve, reject) => {
+  if (!sessionId || !req.sessionStore?.destroy) return resolve();
+  req.sessionStore.destroy(sessionId, (error) => (error ? reject(error) : resolve()));
+});
+
 router.get('/devices', async (req, res) => {
   try {
     const devices = await deviceService.getDevices(req.user.id);
@@ -25,6 +30,7 @@ router.post('/logout-device', async (req, res) => {
     if (!device) return res.status(404).json({ error: 'Device session not found' });
 
     forceLogoutDevice(device._id);
+    await destroySessionById(req, sessionId);
     res.json({ success: true, message: 'Device logged out successfully' });
   } catch (error) {
     res.status(500).json({ error: 'Failed to logout device' });

@@ -14,9 +14,7 @@ const AnimatedNumber = ({ value }) => {
 };
 
 const QuickStats = ({ dashboard }) => {
-  const { streak = 12, songsToday = 0, lastSyncedAt = null } = dashboard || {};
-  const totalXp = 1250;
-  const coins = 245;
+  const { streak = 0, longestStreak = 0, songsToday = 0, lastSyncedAt = null, xp = 0 } = dashboard || {};
 
   // Format time ago
   const getTimeAgo = (dateStr) => {
@@ -31,7 +29,7 @@ const QuickStats = ({ dashboard }) => {
 
   const stats = [
     { label: 'Current Streak', value: streak, unit: 'Days', icon: Flame, color: 'text-orange-400', bg: 'bg-orange-400/10' },
-    { label: 'Total XP', value: totalXp, unit: 'XP', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    { label: 'Total XP', value: xp, unit: 'XP', icon: Trophy, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
     { 
       label: "Today's Listening", 
       value: songsToday, 
@@ -50,7 +48,7 @@ const QuickStats = ({ dashboard }) => {
         </div>
       ) : null
     },
-    { label: 'Coins Earned', value: coins, unit: 'Coins', icon: Target, color: 'text-beatly-primary', bg: 'bg-beatly-primary/10' }
+    { label: 'Longest Streak', value: longestStreak, unit: 'Days', icon: Target, color: 'text-beatly-primary', bg: 'bg-beatly-primary/10' }
   ];
 
   return (

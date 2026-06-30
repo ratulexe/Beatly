@@ -6,7 +6,7 @@ const MemberCard = ({ member, isAdmin, onRemove }) => {
     <div className="flex items-center justify-between p-4 bg-beatly-surface rounded-xl border border-beatly-border hover:border-beatly-border-hover transition-colors group">
       <div className="flex items-center gap-4">
         {member.profileImage ? (
-          <img loading="lazy" src={member.profileImage} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+          <img loading="lazy" src={member.profileImage} alt={member.displayName || member.name} className="w-10 h-10 rounded-full object-cover" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-beatly-surface-hover flex items-center justify-center text-beatly-text-muted">
             <User size={20} />
@@ -14,7 +14,7 @@ const MemberCard = ({ member, isAdmin, onRemove }) => {
         )}
         <div>
           <div className="flex items-center gap-2">
-            <h4 className="font-semibold text-white">{member.name}</h4>
+            <h4 className="font-semibold text-white">{member.displayName || member.name}</h4>
             {member.role === 'admin' && (
               <Shield size={14} className="text-beatly-primary" />
             )}
@@ -25,7 +25,7 @@ const MemberCard = ({ member, isAdmin, onRemove }) => {
       
       {isAdmin && member.role !== 'admin' && (
         <button 
-          onClick={() => onRemove(member.id)}
+          onClick={() => onRemove(member._id || member.id)}
           className="text-xs font-semibold text-beatly-error hover:bg-beatly-error/10 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
         >
           Remove
