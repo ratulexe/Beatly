@@ -1,0 +1,10 @@
+node_modules
+dist
+.DS_Store
+.env
+.env.local
+.git
+.github
+tests/
+vitest.config.js
+lazy-imgs.js

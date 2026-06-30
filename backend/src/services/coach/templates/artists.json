@@ -1,0 +1,29 @@
+[
+  {
+    "id": "artist_new_1",
+    "title": "Listen to one artist you've never heard before",
+    "category": "New Artists",
+    "unit": "artists",
+    "target": 1,
+    "difficulty": "Easy",
+    "frequency": ["Daily"]
+  },
+  {
+    "id": "artist_loyal_10",
+    "title": "Listen to 10 songs from your favorite artist",
+    "category": "Listening Time",
+    "unit": "songs",
+    "target": 10,
+    "difficulty": "Medium",
+    "frequency": ["Weekly"]
+  },
+  {
+    "id": "artist_explore_10",
+    "title": "Explore ten new artists",
+    "category": "New Artists",
+    "unit": "artists",
+    "target": 10,
+    "difficulty": "Hard",
+    "frequency": ["Monthly"]
+  }
+]

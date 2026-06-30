@@ -86,7 +86,7 @@ const InviteModal = ({ isOpen, onClose, groupId }) => {
                 >
                   <div className="flex items-center gap-3">
                     {profileImg ? (
-                      <img src={profileImg} alt={name} className="w-10 h-10 rounded-full object-cover" />
+                      <img loading="lazy" src={profileImg} alt={name} className="w-10 h-10 rounded-full object-cover" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-beatly-primary/20 flex items-center justify-center text-beatly-primary font-bold">
                         {name.charAt(0)}

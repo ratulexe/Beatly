@@ -24,8 +24,8 @@ export default function RecentTracks() {
     });
   };
 
-  const tracks = recentData?.data?.items || [];
-  const totalPages = recentData?.data?.totalPages || 1;
+  const tracks = recentData?.items || [];
+  const totalPages = recentData?.totalPages || 1;
 
   if (isError) {
     return (
@@ -53,7 +53,7 @@ export default function RecentTracks() {
       <TrackFilters 
         onSync={handleSync}
         isSyncing={syncMutation.isPending}
-        syncSummary={syncMutation.data?.data}
+        syncSummary={syncMutation.data}
       />
       
       {syncMutation.isError && (

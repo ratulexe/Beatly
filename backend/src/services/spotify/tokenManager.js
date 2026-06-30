@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { SPOTIFY_CONFIG } from '../../config/spotify.config.js';
+import logger from '../../config/logger.js';
 
 // In-memory lock to prevent multiple concurrent token refreshes for the same user
 const refreshLocks = new Map();
@@ -65,7 +66,7 @@ export const refreshAccessToken = async (user) => {
       
       return access_token;
     } catch (error) {
-      console.error(`[TokenManager] Failed to refresh token for user ${userId}:`, error.message);
+      logger.error(`[TokenManager] Failed to refresh token for user ${userId}:`, error.message);
       throw error;
     } finally {
       // Always remove the lock when done

@@ -1,0 +1,48 @@
+[
+  {
+    "id": "list_30_mins",
+    "title": "Listen for 30 minutes",
+    "category": "Listening Time",
+    "unit": "minutes",
+    "target": 30,
+    "difficulty": "Easy",
+    "frequency": ["Daily"]
+  },
+  {
+    "id": "list_60_mins",
+    "title": "Listen for 1 hour",
+    "category": "Listening Time",
+    "unit": "minutes",
+    "target": 60,
+    "difficulty": "Medium",
+    "frequency": ["Daily"]
+  },
+  {
+    "id": "list_5_hours",
+    "title": "Listen for 5 hours",
+    "category": "Listening Time",
+    "unit": "hours",
+    "target": 5,
+    "difficulty": "Medium",
+    "frequency": ["Weekly"]
+  },
+  {
+    "id": "list_morning",
+    "title": "Morning Listener",
+    "category": "Listening Time",
+    "unit": "songs",
+    "target": 5,
+    "difficulty": "Easy",
+    "frequency": ["Daily"],
+    "condition": "timeOfDay == 'Morning'"
+  },
+  {
+    "id": "list_40_hours",
+    "title": "Reach 40 listening hours",
+    "category": "Listening Time",
+    "unit": "hours",
+    "target": 40,
+    "difficulty": "Hard",
+    "frequency": ["Monthly"]
+  }
+]

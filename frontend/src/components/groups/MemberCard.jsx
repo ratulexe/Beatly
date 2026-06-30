@@ -6,7 +6,7 @@ const MemberCard = ({ member, isAdmin, onRemove }) => {
     <div className="flex items-center justify-between p-4 bg-beatly-surface rounded-xl border border-beatly-border hover:border-beatly-border-hover transition-colors group">
       <div className="flex items-center gap-4">
         {member.profileImage ? (
-          <img src={member.profileImage} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
+          <img loading="lazy" src={member.profileImage} alt={member.name} className="w-10 h-10 rounded-full object-cover" />
         ) : (
           <div className="w-10 h-10 rounded-full bg-beatly-surface-hover flex items-center justify-center text-beatly-text-muted">
             <User size={20} />

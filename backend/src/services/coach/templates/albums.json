@@ -1,0 +1,20 @@
+[
+  {
+    "id": "album_finish_1",
+    "title": "Finish one complete album",
+    "category": "Albums",
+    "unit": "albums",
+    "target": 1,
+    "difficulty": "Medium",
+    "frequency": ["Daily", "Weekly"]
+  },
+  {
+    "id": "album_finish_5",
+    "title": "Listen to 5 complete albums",
+    "category": "Albums",
+    "unit": "albums",
+    "target": 5,
+    "difficulty": "Hard",
+    "frequency": ["Monthly"]
+  }
+]

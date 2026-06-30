@@ -1,0 +1,20 @@
+[
+  {
+    "id": "social_share_1",
+    "title": "Compare your music with 1 friend",
+    "category": "Social",
+    "unit": "friends",
+    "target": 1,
+    "difficulty": "Easy",
+    "frequency": ["Weekly"]
+  },
+  {
+    "id": "social_group_1",
+    "title": "Participate in a Group Challenge",
+    "category": "Social",
+    "unit": "challenges",
+    "target": 1,
+    "difficulty": "Medium",
+    "frequency": ["Monthly"]
+  }
+]

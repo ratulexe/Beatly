@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 const formatDuration = (ms) => {
@@ -7,7 +7,7 @@ const formatDuration = (ms) => {
   return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
-const TrackCard = ({ item }) => {
+const TrackCard = memo(({ item }) => {
   const { trackId: track, playedAt } = item;
   
   if (!track) return null;
@@ -17,8 +17,7 @@ const TrackCard = ({ item }) => {
 
   return (
     <div className="track-card glass-panel" style={styles.card}>
-      <img 
-        src={album?.image || 'https://via.placeholder.com/60'} 
+      <img loading="lazy" src={album?.image || 'https://via.placeholder.com/60'} 
         alt={album?.name || 'Album cover'} 
         style={styles.image}
       />
@@ -34,7 +33,7 @@ const TrackCard = ({ item }) => {
       </div>
     </div>
   );
-};
+});
 
 const styles = {
   card: {

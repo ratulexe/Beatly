@@ -1,23 +1,18 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
-  withCredentials: true
-});
+import { api } from '../apiClient';
 
 export const groupApi = {
   getUserGroups: async () => {
-    const response = await api.get('/groups');
-    return response.data;
+    const response = await api.get('/api/groups');
+    return response;
   },
   
   getGroupDetails: async (groupId) => {
-    const response = await api.get(`/groups/${groupId}`);
-    return response.data;
+    const response = await api.get(`/api/groups/${groupId}`);
+    return response;
   },
   
   createGroup: async (groupData) => {
-    const response = await api.post('/groups', groupData);
-    return response.data;
+    const response = await api.post('/api/groups', groupData);
+    return response;
   }
 };

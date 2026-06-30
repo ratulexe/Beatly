@@ -1,5 +1,6 @@
 import { User } from '../database/index.js';
 import { errorResponse } from '../utils/apiResponse.js';
+import logger from '../config/logger.js';
 
 export const spotifyAuth = async (req, res, next) => {
   try {
@@ -21,7 +22,7 @@ export const spotifyAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error('[Middleware] spotifyAuth error:', error);
+    logger.error('[Middleware] spotifyAuth error:', error);
     res.status(500).json(errorResponse('Internal server error during authentication.'));
   }
 };

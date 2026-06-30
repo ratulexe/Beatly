@@ -22,13 +22,15 @@ export const useProfile = () => {
     mutationFn: userApi.logout,
     onSuccess: () => {
       queryClient.clear(); // Clear all cached data on logout
-      window.location.href = '/login'; // Redirect to login page
     }
   });
 
+  console.log('[useProfile] profileQuery data:', profileQuery.data, 'isError:', profileQuery.isError, 'isPending:', profileQuery.isPending, 'isFetching:', profileQuery.isFetching);
+
   return {
-    profile: profileQuery.data?.data,
-    isLoading: profileQuery.isLoading,
+    profile: profileQuery.data,
+    isLoading: profileQuery.isPending,
+    isFetching: profileQuery.isFetching,
     isError: profileQuery.isError,
     error: profileQuery.error,
     syncProfile: syncMutation.mutate,

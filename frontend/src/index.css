@@ -41,4 +41,60 @@ body {
   border-radius: 20px;
 }
 
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
 
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border: 6px solid var(--color-beatly-bg);
+  border-radius: 20px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Wrapped Themes */
+.theme-classic {
+  --wrapped-bg: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+  --wrapped-text: #ffffff;
+  --wrapped-primary: #1ED760;
+  --wrapped-accent: #535353;
+}
+.theme-neon {
+  --wrapped-bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+  --wrapped-text: #fff;
+  --wrapped-primary: #ff00ff;
+  --wrapped-accent: #00ffff;
+}
+.theme-aurora {
+  --wrapped-bg: linear-gradient(135deg, #001f3f 0%, #0088a9 100%);
+  --wrapped-text: #e0f7fa;
+  --wrapped-primary: #00ffcc;
+  --wrapped-accent: #ff00cc;
+}
+.theme-midnight {
+  --wrapped-bg: linear-gradient(135deg, #000000 0%, #1a1a2e 100%);
+  --wrapped-text: #ffffff;
+  --wrapped-primary: #e94560;
+  --wrapped-accent: #0f3460;
+}
+.theme-green {
+  --wrapped-bg: linear-gradient(135deg, #053b06 0%, #0a0a0a 100%);
+  --wrapped-text: #ffffff;
+  --wrapped-primary: #1ED760;
+  --wrapped-accent: #b4f8c8;
+}
+.theme-synthwave {
+  --wrapped-bg: linear-gradient(135deg, #2a0845 0%, #6441a5 100%);
+  --wrapped-text: #ff9a9e;
+  --wrapped-primary: #fecfef;
+  --wrapped-accent: #a1c4fd;
+}

@@ -11,7 +11,7 @@ const FriendRequestCard = ({ request, type = 'incoming', onAccept, onDecline, on
     <div className="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-beatly-primary">
       <div className="flex items-center gap-4">
         {profileImage ? (
-          <img src={profileImage} alt={name} className="w-12 h-12 rounded-full object-cover" />
+          <img loading="lazy" src={profileImage} alt={name} className="w-12 h-12 rounded-full object-cover" />
         ) : (
           <div className="w-12 h-12 rounded-full bg-beatly-surface-hover flex items-center justify-center text-white font-bold">
             {name.charAt(0)}

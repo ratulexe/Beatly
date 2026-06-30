@@ -1,0 +1,29 @@
+[
+  {
+    "id": "genre_explore_1",
+    "title": "Listen to a new genre",
+    "category": "New Genres",
+    "unit": "genres",
+    "target": 1,
+    "difficulty": "Easy",
+    "frequency": ["Daily"]
+  },
+  {
+    "id": "genre_explore_3",
+    "title": "Explore three new genres",
+    "category": "New Genres",
+    "unit": "genres",
+    "target": 3,
+    "difficulty": "Medium",
+    "frequency": ["Weekly"]
+  },
+  {
+    "id": "genre_deep_dive",
+    "title": "Listen to 10 songs from a single genre",
+    "category": "New Genres",
+    "unit": "songs",
+    "target": 10,
+    "difficulty": "Medium",
+    "frequency": ["Weekly"]
+  }
+]

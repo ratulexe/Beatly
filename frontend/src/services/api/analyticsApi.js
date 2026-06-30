@@ -1,24 +1,19 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
-  withCredentials: true 
-});
+import { api } from '../apiClient';
 
 export const analyticsApi = {
-  generateAnalytics: () => api.post('/analytics/generate'),
+  generateAnalytics: () => api.post('/api/analytics/generate'),
   
-  getOverview: () => api.get('/analytics/overview'),
+  getOverview: () => api.get('/api/analytics/overview'),
   
-  getDailyStats: (days = 7) => api.get('/analytics/daily', { params: { days } }),
+  getDailyStats: (days = 7) => api.get('/api/analytics/daily', { params: { days } }),
   
-  getTopArtists: () => api.get('/analytics/top-artists'),
+  getTopArtists: () => api.get('/api/analytics/top-artists'),
   
-  getTopTracks: () => api.get('/analytics/top-tracks'),
+  getTopTracks: () => api.get('/api/analytics/top-tracks'),
   
-  getTopAlbums: () => api.get('/analytics/top-albums'),
+  getTopAlbums: () => api.get('/api/analytics/top-albums'),
   
-  getGenres: () => api.get('/analytics/genres'),
+  getGenres: () => api.get('/api/analytics/genres'),
   
-  getTimeInsights: () => api.get('/analytics/time-insights')
+  getTimeInsights: () => api.get('/api/analytics/time-insights')
 };

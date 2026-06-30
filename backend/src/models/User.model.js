@@ -23,7 +23,16 @@ const userSchema = new mongoose.Schema({
   lastLogin: { type: Date, default: Date.now },
   connectedAt: { type: Date, default: Date.now },
   role: { type: String, enum: ['user', 'admin'], default: 'user' },
-  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+
+  // Phase 11 Fields
+  xp: { type: Number, default: 0 },
+  currentStreak: { type: Number, default: 0 },
+  longestStreak: { type: Number, default: 0 },
+  listeningPersonality: { type: String }, // e.g., 'Night Owl'
+  privacySettings: {
+    leaderboardVisibility: { type: String, enum: ['public', 'friends', 'group', 'private'], default: 'public' }
+  }
 }, {
 
   timestamps: true,
@@ -39,5 +48,8 @@ const userSchema = new mongoose.Schema({
   toObject: { virtuals: true }
 
 });
+
+userSchema.index({ xp: -1 });
+userSchema.index({ currentStreak: -1 });
 
 export const User = mongoose.model('User', userSchema);

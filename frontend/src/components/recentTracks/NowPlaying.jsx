@@ -8,9 +8,9 @@ const formatDuration = (ms) => {
 };
 
 const NowPlaying = ({ data }) => {
-  if (!data || !data.data || !data.data.track) return null;
+  if (!data || !data.track) return null;
 
-  const { track, isPlaying } = data.data;
+  const { track, isPlaying } = data;
   
   const [localProgress, setLocalProgress] = useState(track.progressMs || 0);
   const lastTrackRef = useRef(track.spotifyTrackId);
@@ -55,8 +55,7 @@ const NowPlaying = ({ data }) => {
       </div>
 
       <div style={styles.body}>
-        <img 
-          src={track.album?.image || 'https://via.placeholder.com/80'} 
+        <img loading="lazy" src={track.album?.image || 'https://via.placeholder.com/80'} 
           alt={track.album?.name || 'Album art'}
           style={styles.albumArt}
         />

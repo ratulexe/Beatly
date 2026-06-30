@@ -1,33 +1,28 @@
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000/api',
-  withCredentials: true
-});
+import { api } from '../apiClient';
 
 export const friendApi = {
   getFriends: async () => {
-    const response = await api.get('/friends');
-    return response.data;
+    const response = await api.get('/api/friends');
+    return response;
   },
   
   getRequests: async () => {
-    const response = await api.get('/friends/requests');
-    return response.data;
+    const response = await api.get('/api/friends/requests');
+    return response;
   },
   
   sendRequest: async (receiverId) => {
-    const response = await api.post('/friends/request', { receiverId });
-    return response.data;
+    const response = await api.post('/api/friends/request', { receiverId });
+    return response;
   },
   
   respondToRequest: async (requestId, status) => {
-    const response = await api.patch(`/friends/request/${requestId}`, { status });
-    return response.data;
+    const response = await api.patch(`/api/friends/request/${requestId}`, { status });
+    return response;
   },
   
   removeFriend: async (friendId) => {
-    const response = await api.delete(`/friends/${friendId}`);
-    return response.data;
+    const response = await api.delete(`/api/friends/${friendId}`);
+    return response;
   }
 };

@@ -22,19 +22,24 @@ Beatly is a premium Spotify analytics platform where every Spotify Premium Famil
 - Backend: `cd backend && npm run dev`
 
 ## Scripts
+- `npm run dev` - Start local development
+- `npm run test` - Run tests
 - `npm run build` - Build for production
-- `npm start` - Start production server
 
-## Roadmap
-- Phase 1: Project Initialization & Architecture
-- Phase 2: Authentication & Spotify Integration
-- Phase 3: Core Dashboard & Analytics
+## Docker / Production Deployment
+1. Ensure Docker and Docker Compose are installed.
+2. In the project root, run:
+   ```bash
+   docker-compose up --build -d
+   ```
+3. The frontend will be available at `http://localhost`, and the backend at `http://localhost:5000`.
+
+## Architecture & Contributions
+- Read [ARCHITECTURE.md](./ARCHITECTURE.md) for system design details.
+- Read [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines on how to contribute.
 
 ## License
 MIT
-
-## GitHub
-[Repository Link]
 
 ## Contributing
 Contributions are welcome.

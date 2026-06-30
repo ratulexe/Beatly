@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
-import { Home, BarChart2, Clock, Users, Disc, User, Settings, LogOut, Menu, X, Search, Bell } from 'lucide-react';
+import { Home, BarChart2, Clock, Users, Disc, User, Settings, LogOut, PanelLeftClose, PanelLeftOpen, X, Search, Bell, Trophy, GitCompare, Award, Activity as ActivityIcon, Sparkles, Target, Gift } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
+import FloatingChat from '../components/ai/FloatingChat';
 
 export default function DashboardLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
   const { logout, profile: user } = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,7 +17,15 @@ export default function DashboardLayout() {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: Home },
+    { name: 'Wrapped 2026', path: '/wrapped', icon: Gift },
+    { name: 'Discover', path: '/discover', icon: Sparkles },
+    { name: 'Beatly Coach', path: '/coach', icon: Target },
+    { name: 'Beatly AI', path: '/ai', icon: Sparkles },
     { name: 'Analytics', path: '/analytics', icon: BarChart2 },
+    { name: 'Leaderboard', path: '/leaderboard', icon: Trophy },
+    { name: 'Compare', path: '/compare', icon: GitCompare },
+    { name: 'Achievements', path: '/achievements', icon: Award },
+    { name: 'Activity Feed', path: '/activity', icon: ActivityIcon },
     { name: 'Recent Tracks', path: '/recent', icon: Clock },
     { name: 'Top Artists', path: '/artists', icon: Users },
     { name: 'Top Albums', path: '/albums', icon: Disc },
@@ -44,21 +53,21 @@ export default function DashboardLayout() {
 
       {/* Sidebar */}
       <aside 
-        className={`fixed inset-y-0 left-0 z-30 w-64 glass-panel transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto m-4 flex flex-col ${sidebarOpen ? 'translate-x-0' : '-translate-x-[120%]'}`}
+        className={`fixed inset-y-0 left-0 z-30 glass-panel transform transition-all duration-300 ease-in-out lg:static lg:inset-auto flex flex-col ${sidebarOpen ? 'translate-x-0 w-64 m-4 opacity-100' : '-translate-x-[120%] lg:translate-x-0 lg:w-0 lg:m-0 lg:p-0 lg:opacity-0 overflow-hidden'}`}
       >
-        <div className="flex items-center justify-between p-6">
+        <div className="flex items-center justify-between p-6 w-64">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-beatly-primary rounded-full flex items-center justify-center">
               <span className="text-black font-extrabold text-xl">B</span>
             </div>
             <span className="text-2xl font-extrabold tracking-tight">Beatly</span>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-beatly-text-muted hover:text-white">
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-beatly-text-muted hover:text-white" aria-label="Close Sidebar">
             <X size={24} />
           </button>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+        <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto w-64">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -80,7 +89,7 @@ export default function DashboardLayout() {
           })}
         </nav>
 
-        <div className="p-4 border-t border-beatly-border">
+        <div className="p-4 border-t border-beatly-border w-64">
           <button 
             onClick={handleLogout}
             className="flex w-full items-center gap-3 px-4 py-3 text-beatly-text-muted hover:text-beatly-error hover:bg-beatly-error/10 rounded-xl transition-colors font-bold"
@@ -98,10 +107,11 @@ export default function DashboardLayout() {
         <header className="h-20 px-6 lg:px-8 flex items-center justify-between z-10 relative">
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 text-beatly-text-muted hover:text-white hover:bg-beatly-surface rounded-lg"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 text-beatly-text-muted hover:text-white hover:bg-beatly-surface rounded-lg transition-colors"
+              aria-label="Toggle Sidebar"
             >
-              <Menu size={24} />
+              {sidebarOpen ? <PanelLeftClose size={24} /> : <PanelLeftOpen size={24} />}
             </button>
             <h1 className="text-2xl font-extrabold hidden md:block">{getPageTitle()}</h1>
           </div>
@@ -127,7 +137,7 @@ export default function DashboardLayout() {
                 <p className="text-xs text-beatly-text-muted capitalize">{user?.product || 'Free'} Plan</p>
               </div>
               {user?.profileImage ? (
-                <img src={user.profileImage} alt="Profile" className="w-10 h-10 rounded-full border border-beatly-border" />
+                <img loading="lazy" src={user.profileImage} alt="Profile" className="w-10 h-10 rounded-full border border-beatly-border" />
               ) : (
                 <div className="w-10 h-10 rounded-full bg-beatly-surface border border-beatly-border flex items-center justify-center">
                   <User size={20} className="text-beatly-text-muted" />
@@ -144,6 +154,7 @@ export default function DashboardLayout() {
           </div>
         </main>
         
+        <FloatingChat />
       </div>
     </div>
   );

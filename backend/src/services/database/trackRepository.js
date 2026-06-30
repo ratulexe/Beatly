@@ -12,23 +12,29 @@ export const trackRepository = {
     // Deduplicate incoming array by spotifyId
     const uniqueArtists = Array.from(new Map(artists.map(a => [a.id, a])).values());
 
-    const bulkOps = uniqueArtists.map(artist => ({
-      updateOne: {
-        filter: { spotifyArtistId: artist.id },
-        update: {
-          $set: {
-            spotifyArtistId: artist.id,
-            name: artist.name,
-            genres: artist.genres || [],
-            followers: artist.followers?.total || 0,
-            popularity: artist.popularity || 0,
-            image: artist.images?.[0]?.url || null,
-            spotifyUrl: artist.external_urls?.spotify
-          }
-        },
-        upsert: true
+    const bulkOps = uniqueArtists.map(artist => {
+      const imageUrl = artist.images?.[0]?.url;
+      const setFields = {
+        spotifyArtistId: artist.id,
+        name: artist.name,
+        genres: artist.genres || [],
+        followers: artist.followers?.total || 0,
+        popularity: artist.popularity || 0,
+        spotifyUrl: artist.external_urls?.spotify
+      };
+      // Only overwrite image when we actually have one — prevents
+      // simplified artist objects from blanking out existing images.
+      if (imageUrl) {
+        setFields.image = imageUrl;
       }
-    }));
+      return {
+        updateOne: {
+          filter: { spotifyArtistId: artist.id },
+          update: { $set: setFields },
+          upsert: true
+        }
+      };
+    });
 
     const result = await Artist.bulkWrite(bulkOps, { ordered: false });
     

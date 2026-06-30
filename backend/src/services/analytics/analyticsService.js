@@ -1,5 +1,6 @@
 import { ListeningHistory } from '../../database/index.js';
 import { analyticsRepository } from '../database/analyticsRepository.js';
+import logger from '../../config/logger.js';
 import {
   buildOverviewPipeline,
   buildTopArtistsPipeline,
@@ -98,7 +99,7 @@ export const generateOverallStats = async (userId) => {
   const saved = await analyticsRepository.saveSnapshot(userId, 'overall', periodStart, periodEnd, snapshotData);
 
   const duration = Date.now() - startTime;
-  console.log(`[Analytics] Overall stats generated for user ${userId} in ${duration}ms`);
+  logger.info(`[Analytics] Overall stats generated for user ${userId} in ${duration}ms`);
 
   return saved;
 };
@@ -156,9 +157,9 @@ export const generateAllAnalytics = async (userId) => {
     await Promise.all(dailyPromises);
 
     const duration = Date.now() - startTime;
-    console.log(`[Analytics] All analytics generated for user ${userId} in ${duration}ms`);
+    logger.info(`[Analytics] All analytics generated for user ${userId} in ${duration}ms`);
   } catch (error) {
-    console.error(`[Analytics] Failed to generate analytics for user ${userId}:`, error.message);
+    logger.error(`[Analytics] Failed to generate analytics for user ${userId}:`, error.message);
     // Don't rethrow — analytics generation should not block sync
   }
 };

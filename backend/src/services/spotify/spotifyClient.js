@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { SPOTIFY_CONFIG } from '../../config/spotify.config.js';
 import { getAccessToken } from './tokenManager.js';
 import { sanitizeSpotifyError } from '../../utils/spotifyHelpers.js';
+import logger from '../../config/logger.js';
 
 // Internal reusable Axios instance
 const axiosInstance = axios.create({
@@ -44,7 +45,7 @@ const executeRequest = async (user, method, endpoint, data = null, customConfig 
       const response = await axiosInstance.request(config);
       const duration = Date.now() - startTime;
 
-      console.log(`[SpotifyClient] [${reqId}] ${method.toUpperCase()} ${endpoint} - ${response.status} (${duration}ms)`);
+      logger.info(`[SpotifyClient] [${reqId}] ${method.toUpperCase()} ${endpoint} - ${response.status} (${duration}ms)`);
       
       return response.data;
       
@@ -77,10 +78,10 @@ const executeRequest = async (user, method, endpoint, data = null, customConfig 
       // For 401 Unauthorized, tokenManager should have refreshed it prior. 
       // If we still get a 401, it means the token was revoked or refresh failed.
       if (status === 401) {
-        console.error(`[SpotifyClient] [${reqId}] 401 Unauthorized even after token generation.`);
+        logger.error(`[SpotifyClient] [${reqId}] 401 Unauthorized even after token generation.`);
       }
 
-      console.error(`[SpotifyClient] [${reqId}] ${method.toUpperCase()} ${endpoint} failed after ${attempts} attempts`);
+      logger.error(`[SpotifyClient] [${reqId}] ${method.toUpperCase()} ${endpoint} failed after ${attempts} attempts`);
       
       // Sanitize and throw the error
       throw sanitizeSpotifyError(error);

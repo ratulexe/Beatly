@@ -2,13 +2,17 @@ import { env } from '../config/env.js';
 import * as spotifyAuthService from '../services/spotify/spotifyAuth.service.js';
 import { syncUser } from '../services/spotify/spotifyUser.service.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
+import logger from '../config/logger.js';
 
 export const login = (req, res) => {
   const state = spotifyAuthService.generateState();
   req.session.spotifyState = state;
   const authorizeUrl = spotifyAuthService.getAuthorizeUrl(state);
-  console.log('Redirecting to:', authorizeUrl);
-  res.redirect(authorizeUrl);
+  req.session.save((err) => {
+    if (err) logger.error('Session save error:', err);
+    logger.info('Redirecting to:', authorizeUrl);
+    res.redirect(authorizeUrl);
+  });
 };
 
 export const callback = async (req, res, next) => {
@@ -30,10 +34,13 @@ export const callback = async (req, res, next) => {
     
     // Store only userId in session
     req.session.userId = user._id;
-    
-    res.redirect(`${env.CLIENT_URL}/profile`);
+    req.session.save((err) => {
+      if (err) logger.error('Session save error in callback:', err);
+      console.log(`[SpotifyCallback] Saved session ID: ${req.session.id}, userId: ${req.session.userId}`);
+      res.redirect(`${env.CLIENT_URL}/profile`);
+    });
   } catch (error) {
-    console.error('Spotify callback error:', error);
+    logger.error('Spotify callback error:', error);
     return res.redirect(`${env.CLIENT_URL}/login?error=invalid_token`);
   }
 };
