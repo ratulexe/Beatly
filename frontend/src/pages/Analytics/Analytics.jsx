@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { useOverview } from '../../hooks/useOverview';
 import { useTimeInsights } from '../../hooks/useTimeInsights';
 import { useGenres } from '../../hooks/useGenres';
 import { Spinner } from '../../components/ui/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState';
-import { TimeDistributionChart } from '../../components/charts/TimeDistributionChart';
-import { GenreChart } from '../../components/charts/GenreChart';
 import { Card } from '../../components/ui/Card';
 import { motion } from 'framer-motion';
 import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
+
+const TimeDistributionChart = lazy(() =>
+  import('../../components/charts/TimeDistributionChart').then((module) => ({
+    default: module.TimeDistributionChart,
+  }))
+);
+
+const GenreChart = lazy(() =>
+  import('../../components/charts/GenreChart').then((module) => ({
+    default: module.GenreChart,
+  }))
+);
 
 export default function Analytics() {
   const { data: overview, isLoading: overviewLoading, isError: overviewError } = useOverview();
@@ -36,11 +46,15 @@ export default function Analytics() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <TimeDistributionChart hourlyData={timeInsights?.hourly} />
+          <Suspense fallback={<div className="h-[360px] rounded-2xl bg-beatly-surface animate-pulse" />}>
+            <TimeDistributionChart hourlyData={timeInsights?.hourly} />
+          </Suspense>
         </motion.div>
         
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <GenreChart genres={genres} />
+          <Suspense fallback={<div className="h-[360px] rounded-2xl bg-beatly-surface animate-pulse" />}>
+            <GenreChart genres={genres} />
+          </Suspense>
         </motion.div>
       </div>
 

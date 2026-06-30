@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Home, BarChart2, Clock, Users, Disc, User, Settings, LogOut, PanelLeftClose, PanelLeftOpen, X, Search, Bell, Trophy, GitCompare, Award, Activity as ActivityIcon, Sparkles, Target, Gift } from 'lucide-react';
 import { useProfile } from '../hooks/useProfile';
-import FloatingChat from '../components/ai/FloatingChat';
+const FloatingChat = lazy(() => import('../components/ai/FloatingChat'));
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 1024);
@@ -154,7 +154,9 @@ export default function DashboardLayout() {
           </div>
         </main>
         
-        <FloatingChat />
+        <Suspense fallback={null}>
+          <FloatingChat />
+        </Suspense>
       </div>
     </div>
   );

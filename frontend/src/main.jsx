@@ -51,7 +51,7 @@ createRoot(document.getElementById('root')).render(
       persistOptions={{ persister }}
       onSuccess={() => {
         queryClient.resumePausedMutations().then(() => {
-          queryClient.invalidateQueries();
+          queryClient.invalidateQueries({ refetchType: 'active' });
         });
       }}
     >

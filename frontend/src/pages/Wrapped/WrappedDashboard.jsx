@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Play, Sparkles, Image, Clock, Share2, Music, Crown, TrendingUp, Calendar, Download, FileText, ChevronRight } from 'lucide-react';
-import StoryViewer from './WrappedViewer/StoryViewer';
+import { Play, Sparkles, Clock, Share2, Music, Crown, TrendingUp, Calendar, Download, ChevronRight } from 'lucide-react';
 import ComparisonCard from './WrappedCompare/ComparisonCard';
 import { animate, motion, AnimatePresence } from 'framer-motion';
 import { api } from '../../services/apiClient';
+
+const StoryViewer = lazy(() => import('./WrappedViewer/StoryViewer'));
 
 const AnimatedCounter = ({ from = 0, to, duration = 2, suffix = '' }) => {
   const [value, setValue] = useState(from);
@@ -202,11 +203,13 @@ export default function WrappedDashboard() {
 
   if (isPlaying && mappedSlides.length > 0) {
     return (
-      <StoryViewer 
-        slides={mappedSlides} 
-        theme={activeTheme} 
-        onComplete={() => setIsPlaying(false)} 
-      />
+      <Suspense fallback={null}>
+        <StoryViewer
+          slides={mappedSlides}
+          theme={activeTheme}
+          onComplete={() => setIsPlaying(false)}
+        />
+      </Suspense>
     );
   }
 
