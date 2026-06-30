@@ -4,14 +4,16 @@ import { env } from './env.js';
 
 const isTestRun = env.NODE_ENV === 'test' || process.env.BEATLY_TEST === 'true' || process.execArgv.includes('--test');
 
+export const sessionStore = isTestRun ? new session.MemoryStore() : MongoStore.create({
+  mongoUrl: env.MONGODB_URI,
+  collectionName: 'sessions'
+});
+
 export const sessionMiddleware = session({
   secret: env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: isTestRun ? undefined : MongoStore.create({
-    mongoUrl: env.MONGODB_URI,
-    collectionName: 'sessions'
-  }),
+  store: sessionStore,
   cookie: {
     secure: env.NODE_ENV === 'production',
     httpOnly: true,
