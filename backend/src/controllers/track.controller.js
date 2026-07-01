@@ -3,12 +3,37 @@ import { trackRepository } from '../services/database/trackRepository.js';
 import * as analyticsService from '../services/analytics/analyticsService.js';
 import { rankingService } from '../services/ranking/ranking.service.js';
 import { achievementService } from '../services/ranking/achievement.service.js';
+import { AnalyticsSnapshot, User } from '../database/index.js';
 import { successResponse, errorResponse } from '../utils/apiResponse.js';
 import logger from '../config/logger.js';
 
 export const syncTracks = async (req, res) => {
   try {
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          autoSyncInProgress: true,
+          autoSyncStartedAt: new Date(),
+          'sync.lastSyncAt': new Date()
+        }
+      }
+    );
+
     const result = await spotifyTrackService.syncRecentlyPlayed(req.user);
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          autoSyncInProgress: false,
+          autoSyncStartedAt: null,
+          'sync.lastSuccessfulSyncAt': new Date(),
+          'sync.lastSyncError': null,
+          'sync.tracksAdded': result.newTracks || 0,
+          'sync.tracksSkipped': result.duplicates || 0
+        }
+      }
+    );
     
     // Auto-trigger background jobs (fire and forget)
     (async () => {
@@ -40,6 +65,17 @@ export const syncTracks = async (req, res) => {
     
     return res.status(200).json(successResponse(result, 'Synchronization completed.'));
   } catch (error) {
+    await User.updateOne(
+      { _id: req.user._id },
+      {
+        $set: {
+          autoSyncInProgress: false,
+          autoSyncStartedAt: null,
+          'sync.lastFailedSyncAt': new Date(),
+          'sync.lastSyncError': error.message || 'Failed to sync tracks.'
+        }
+      }
+    );
     logger.error('[TrackController] Error in syncTracks:', error);
     return res.status(error.status || 500).json(errorResponse(error.message || 'Failed to sync tracks.'));
   }

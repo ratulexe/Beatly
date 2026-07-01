@@ -43,6 +43,11 @@ export const env = {
   SESSION_SECRET: process.env.SESSION_SECRET || 'fallback_secret',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
   CACHE_DRIVER: process.env.CACHE_DRIVER || 'memory',
+
+  AUTO_SYNC_ENABLED: process.env.AUTO_SYNC_ENABLED || 'false',
+  AUTO_SYNC_INTERVAL_MINUTES: process.env.AUTO_SYNC_INTERVAL_MINUTES || '15',
+  AUTO_SYNC_BATCH_SIZE: process.env.AUTO_SYNC_BATCH_SIZE || '10',
+  AUTO_SYNC_SECRET: process.env.AUTO_SYNC_SECRET || '',
   
   // AI Configuration
   AI_PROVIDER: process.env.AI_PROVIDER || 'ollama',

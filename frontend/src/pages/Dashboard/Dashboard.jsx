@@ -7,6 +7,7 @@ import { Spinner } from '../../components/ui/Spinner';
 import { ErrorState } from '../../components/ui/ErrorState';
 import { Clock, Disc, Users, Music, BarChart2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import SyncFreshnessBadge from '../../components/sync/SyncFreshnessBadge';
 
 export default function Dashboard() {
   const { data: overview, isLoading, isError, refetch } = useOverview();
@@ -46,6 +47,10 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      <div className="flex justify-end">
+        <SyncFreshnessBadge />
+      </div>
+
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((stat, i) => {

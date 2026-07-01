@@ -44,6 +44,7 @@ export default defineConfig({
         // Exclude all API routes and dynamically fetched data.
         globPatterns: ['**/*.{js,css,ico,png,svg}'],
         cleanupOutdatedCaches: true,
+        navigateFallback: null,
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: []
       }

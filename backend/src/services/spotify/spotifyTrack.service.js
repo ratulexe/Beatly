@@ -13,11 +13,12 @@ export const getRecentlyPlayed = async (user, limit = 50, after = null, before =
   return data;
 };
 
-export const syncRecentlyPlayed = async (user) => {
+export const syncRecentlyPlayed = async (user, options = {}) => {
   const startTime = Date.now();
+  const after = options.after ? new Date(options.after).getTime() : null;
   
   // 1. Fetch from Spotify
-  const data = await getRecentlyPlayed(user, 50);
+  const data = await getRecentlyPlayed(user, 50, Number.isFinite(after) ? after : null);
   const items = data.items || [];
   
   if (items.length === 0) {

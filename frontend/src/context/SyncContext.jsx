@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { api, flushOfflineMutations, getPendingMutationCount, SOCKET_BASE_URL } from '../services/apiClient';
+import { useAppOpenSpotifySync } from '../hooks/useAppOpenSpotifySync';
 
 const SyncContext = createContext();
 
@@ -15,6 +16,29 @@ export const SyncProvider = ({ children }) => {
   const socketRef = useRef(null);
   const [deviceId, setDeviceId] = useState(localStorage.getItem('beatly_device_id'));
   const queryClient = useQueryClient();
+
+  const handleSpotifySyncStart = useCallback(() => {
+    setIsSyncing(true);
+  }, []);
+
+  const handleSpotifySyncSuccess = useCallback(() => {
+    setLastSyncTime(new Date());
+  }, []);
+
+  const handleSpotifySyncFailure = useCallback((error) => {
+    console.warn('Background Spotify sync failed', error);
+  }, []);
+
+  const handleSpotifySyncEnd = useCallback(() => {
+    setIsSyncing(false);
+  }, []);
+
+  useAppOpenSpotifySync({
+    onSyncStart: handleSpotifySyncStart,
+    onSyncSuccess: handleSpotifySyncSuccess,
+    onSyncFailure: handleSpotifySyncFailure,
+    onSyncEnd: handleSpotifySyncEnd
+  });
 
   useEffect(() => {
     const refreshPending = async () => {

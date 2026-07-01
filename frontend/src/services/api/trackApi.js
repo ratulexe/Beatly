@@ -11,6 +11,11 @@ export const trackApi = {
     return response.data;
   },
 
+  getSyncStatus: async () => {
+    const response = await api.get('/api/sync/status');
+    return response.data || response;
+  },
+
   getNowPlaying: async () => {
     const response = await api.get(`/api/tracks/now-playing?t=${Date.now()}`);
     return response.data;

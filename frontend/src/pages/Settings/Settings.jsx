@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { MonitorSmartphone, Shield, Bell, User, ChevronRight } from 'lucide-react';
 import { PageContainer } from '../../components/layout/PageContainer';
+import SyncFreshnessBadge from '../../components/sync/SyncFreshnessBadge';
 
 export default function Settings() {
   const sections = [
@@ -38,6 +39,8 @@ export default function Settings() {
           <h1 className="text-4xl font-extrabold text-white mb-2">Settings</h1>
           <p className="text-beatly-text-muted text-lg">Manage your Beatly experience and connected devices.</p>
         </div>
+
+        <SyncFreshnessBadge />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {sections.map((section, index) => (

@@ -21,6 +21,7 @@ import wrappedRoutes from './wrapped.routes.js';
 import deviceRoutes from './device.routes.js';
 import syncRoutes from './sync.routes.js';
 import sessionRoutes from './session.routes.js';
+import internalRoutes from './internal.routes.js';
 
 const router = Router();
 
@@ -55,5 +56,6 @@ router.use('/api/discover', discoverRoutes);
 router.use('/api/devices', deviceRoutes);
 router.use('/api/sync', syncRoutes);
 router.use('/api/session', sessionRoutes);
+router.use('/api/internal', internalRoutes);
 
 export default router;

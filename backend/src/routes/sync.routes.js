@@ -4,6 +4,7 @@ import { spotifyAuth as requireAuth } from '../middlewares/spotifyAuth.js';
 import * as syncService from '../services/sync/sync.service.js';
 import * as syncQueueService from '../services/sync/syncQueue.service.js';
 import * as deviceService from '../services/sync/device.service.js';
+import { env } from '../config/env.js';
 
 const router = express.Router();
 
@@ -16,9 +17,40 @@ const validate = (validations) => async (req, res, next) => {
   next();
 };
 
+const getFreshnessThresholdMs = () => {
+  const minutes = Number.parseInt(env.AUTO_SYNC_INTERVAL_MINUTES, 10);
+  return (Number.isInteger(minutes) && minutes > 0 ? minutes : 15) * 60 * 1000;
+};
+
+const getDataFreshness = (user) => {
+  if (user.autoSyncInProgress) return 'syncing';
+
+  const lastSuccessfulSyncAt = user.sync?.lastSuccessfulSyncAt;
+  const lastFailedSyncAt = user.sync?.lastFailedSyncAt;
+
+  if (lastFailedSyncAt && (!lastSuccessfulSyncAt || lastFailedSyncAt > lastSuccessfulSyncAt)) {
+    return 'failed';
+  }
+
+  if (!lastSuccessfulSyncAt) return 'unknown';
+
+  const ageMs = Date.now() - new Date(lastSuccessfulSyncAt).getTime();
+  return ageMs > getFreshnessThresholdMs() ? 'stale' : 'fresh';
+};
+
 router.get('/status', async (req, res) => {
   const metrics = await syncQueueService.getSyncStatus(req.user);
-  res.json({ status: 'online', message: 'Sync engine is running.', metrics });
+  res.json({
+    status: 'online',
+    message: 'Sync engine is running.',
+    metrics,
+    lastSyncAt: req.user.sync?.lastSyncAt || null,
+    lastSuccessfulSyncAt: req.user.sync?.lastSuccessfulSyncAt || null,
+    lastFailedSyncAt: req.user.sync?.lastFailedSyncAt || null,
+    lastSyncError: req.user.sync?.lastSyncError || null,
+    isSyncing: Boolean(req.user.autoSyncInProgress),
+    dataFreshness: getDataFreshness(req.user)
+  });
 });
 
 router.post('/mutations', validate([

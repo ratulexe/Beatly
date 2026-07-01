@@ -7,6 +7,7 @@ import { ErrorState } from '../../components/ui/ErrorState';
 import { Card } from '../../components/ui/Card';
 import { motion } from 'framer-motion';
 import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
+import SyncFreshnessBadge from '../../components/sync/SyncFreshnessBadge';
 
 const TimeDistributionChart = lazy(() =>
   import('../../components/charts/TimeDistributionChart').then((module) => ({
@@ -37,11 +38,12 @@ export default function Analytics() {
 
   return (
     <div className="space-y-8 pb-10">
-      <div className="flex justify-between items-end mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-end mb-8">
         <div>
           <h1 className="text-3xl font-extrabold mb-2">Analytics</h1>
           <p className="text-beatly-text-muted font-semibold">Deep dive into your listening habits</p>
         </div>
+        <SyncFreshnessBadge />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

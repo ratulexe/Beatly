@@ -7,6 +7,7 @@ import RecentTrackList from '../../components/recentTracks/RecentTrackList';
 import Pagination from '../../components/recentTracks/Pagination';
 import NowPlaying from '../../components/recentTracks/NowPlaying';
 import { Clock } from 'lucide-react';
+import SyncFreshnessBadge from '../../components/sync/SyncFreshnessBadge';
 
 export default function RecentTracks() {
   const [page, setPage] = useState(1);
@@ -38,13 +39,18 @@ export default function RecentTracks() {
 
   return (
     <div className="pb-10 max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center gap-4 mb-4">
-        <div className="w-12 h-12 bg-blue-400/10 text-blue-400 rounded-2xl flex items-center justify-center">
-          <Clock size={28} />
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-blue-400/10 text-blue-400 rounded-2xl flex items-center justify-center">
+            <Clock size={28} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-extrabold mb-1">Recent Tracks</h1>
+            <p className="text-beatly-text-muted font-semibold">Your Spotify listening history</p>
+          </div>
         </div>
         <div>
-          <h1 className="text-3xl font-extrabold mb-1">Recent Tracks</h1>
-          <p className="text-beatly-text-muted font-semibold">Your Spotify listening history</p>
+          <SyncFreshnessBadge />
         </div>
       </div>
 

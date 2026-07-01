@@ -19,6 +19,18 @@ const userSchema = new mongoose.Schema({
     tokenType: { type: String, default: 'Bearer' }
   },
 
+  autoSyncEnabled: { type: Boolean, default: true },
+  autoSyncInProgress: { type: Boolean, default: false },
+  autoSyncStartedAt: { type: Date },
+  sync: {
+    lastSyncAt: { type: Date },
+    lastSuccessfulSyncAt: { type: Date },
+    lastFailedSyncAt: { type: Date },
+    lastSyncError: { type: String },
+    tracksAdded: { type: Number, default: 0 },
+    tracksSkipped: { type: Number, default: 0 }
+  },
+
   isActive: { type: Boolean, default: true },
   lastLogin: { type: Date, default: Date.now },
   connectedAt: { type: Date, default: Date.now },
