@@ -24,7 +24,10 @@ export const useProfile = () => {
 
     const previousProfileId = localStorage.getItem(CURRENT_USER_KEY);
     if (previousProfileId && previousProfileId !== String(profileId)) {
-      queryClient.clear();
+      localStorage.removeItem('beatly_device_id');
+      queryClient.removeQueries({
+        predicate: (query) => query.queryKey[0] !== 'userProfile'
+      });
       queryClient.setQueryData(['userProfile'], profileQuery.data);
     }
 
@@ -46,11 +49,9 @@ export const useProfile = () => {
     }
   });
 
-  const isRefreshingProfile = profileQuery.isFetching && !profileQuery.isPending;
-
   return {
-    profile: isRefreshingProfile ? undefined : profileQuery.data,
-    isLoading: profileQuery.isPending || isRefreshingProfile,
+    profile: profileQuery.data,
+    isLoading: profileQuery.isPending,
     isFetching: profileQuery.isFetching,
     isError: profileQuery.isError,
     error: profileQuery.error,

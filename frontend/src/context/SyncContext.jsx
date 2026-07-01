@@ -25,8 +25,10 @@ export const SyncProvider = ({ children }) => {
       setIsOnline(true);
       setIsSyncing(true);
       try {
-        await flushOfflineMutations();
-        await queryClient.invalidateQueries();
+        const result = await flushOfflineMutations();
+        if (result.flushed > 0) {
+          await queryClient.invalidateQueries({ refetchType: 'active' });
+        }
         setLastSyncTime(new Date());
       } catch (error) {
         console.error('Offline queue replay failed', error);
