@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: './', // Ensures relative paths for Electron
+  base: process.env.VITE_ASSET_BASE || (process.env.VERCEL ? '/' : './'),
   cacheDir: 'node_modules/.vite_new', // Bypass the locked .vite folder
   plugins: [
     react(),
