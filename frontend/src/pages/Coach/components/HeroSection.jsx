@@ -1,12 +1,61 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Bot, ArrowRight, Flame, Trophy, Coins, Target } from 'lucide-react';
+import { Bot, ArrowRight, Target } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+const toNumber = (value, fallback = 0) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+};
+
+const getGoalProgress = (goal) => {
+  if (!goal) return 0;
+  if (goal.completed || goal.completedAt || goal.status === 'completed') return 1;
+
+  const target = toNumber(goal.targetValue ?? goal.target ?? goal.goalValue);
+  const current = toNumber(goal.currentValue ?? goal.current ?? goal.progress);
+
+  if (target <= 0) {
+    return current > 0 ? Math.min(current / 100, 1) : 0;
+  }
+
+  return Math.min(current / target, 1);
+};
+
+const calculateCoachScore = (dashboard) => {
+  if (!dashboard) return 0;
+
+  const explicitScore = Number(dashboard.coachScore);
+  if (Number.isFinite(explicitScore)) {
+    return Math.max(0, Math.min(100, Math.round(explicitScore)));
+  }
+
+  const streak = toNumber(dashboard.streak ?? dashboard.currentStreak);
+  const longestStreak = toNumber(dashboard.longestStreak);
+  const songsToday = toNumber(dashboard.songsToday);
+  const xp = toNumber(dashboard.xp);
+  const level = toNumber(dashboard.level, 1);
+  const habits = Array.isArray(dashboard.habits) ? dashboard.habits : [];
+  const goals = Array.isArray(dashboard.goals) ? dashboard.goals : [];
+  const averageGoalProgress = goals.length
+    ? goals.reduce((total, goal) => total + getGoalProgress(goal), 0) / goals.length
+    : 0;
+
+  const score =
+    Math.min(20, songsToday * 2) +
+    Math.min(15, streak * 3) +
+    Math.min(10, longestStreak * 1.5) +
+    Math.min(20, averageGoalProgress * 20) +
+    Math.min(15, habits.length * 5) +
+    Math.min(20, level * 3 + xp / 150);
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+};
+
 const HeroSection = ({ dashboard, profile }) => {
-  const { streak, goals, habits } = dashboard || {};
+  const { goals } = dashboard || {};
   const todayGoal = goals?.find(g => g.frequency === 'Daily');
-  const coachScore = 82; // Simulated based on logic later
+  const coachScore = calculateCoachScore(dashboard);
   const displayName = profile?.displayName || profile?.name || 'there';
 
   const getGreeting = () => {
