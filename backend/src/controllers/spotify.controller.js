@@ -8,6 +8,12 @@ export const login = (req, res) => {
   const state = spotifyAuthService.generateState();
   req.session.spotifyState = state;
   const authorizeUrl = spotifyAuthService.getAuthorizeUrl(state);
+  res.cookie('beatly_spotify_state', state, {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    maxAge: 10 * 60 * 1000
+  });
   req.session.save((err) => {
     if (err) logger.error('Session save error:', err);
     logger.info('Redirecting to:', authorizeUrl);
@@ -19,12 +25,18 @@ export const callback = async (req, res, next) => {
   const code = req.query.code || null;
   const state = req.query.state || null;
   const storedState = req.session ? req.session.spotifyState : null;
+  const cookieState = req.cookies?.beatly_spotify_state || null;
 
-  if (state === null || state !== storedState) {
+  if (state === null || (state !== storedState && state !== cookieState)) {
     return res.redirect(`${env.CLIENT_URL}/login?error=state_mismatch`);
   }
 
   delete req.session.spotifyState; // Clear state after use
+  res.clearCookie('beatly_spotify_state', {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax'
+  });
 
   try {
     const tokens = await spotifyAuthService.exchangeCodeForTokens(code);
