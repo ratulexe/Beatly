@@ -13,9 +13,11 @@ import HabitCard from './components/HabitCard';
 import AIInsightCard from './components/AIInsightCard';
 import AIPersonalityCard from './components/AIPersonalityCard';
 import RewardsSection from './components/RewardsSection';
+import { useProfile } from '../../hooks/useProfile';
 
 const CoachDashboard = () => {
   const queryClient = useQueryClient();
+  const { profile, isLoading: isProfileLoading } = useProfile();
 
   const dashboardQuery = useQuery({
     queryKey: ['coach', 'dashboard'],
@@ -58,7 +60,7 @@ const CoachDashboard = () => {
     }
   });
 
-  const loading = dashboardQuery.isLoading || calendarQuery.isLoading || challengesQuery.isLoading;
+  const loading = isProfileLoading || dashboardQuery.isLoading || calendarQuery.isLoading || challengesQuery.isLoading;
   const hasError = dashboardQuery.isError || calendarQuery.isError || challengesQuery.isError;
 
   if (loading) {
@@ -99,7 +101,7 @@ const CoachDashboard = () => {
     <div className="p-4 md:p-8 space-y-8 pb-32 max-w-7xl mx-auto">
       
       {/* 1. Hero Section */}
-      <HeroSection dashboard={dashboard} />
+      <HeroSection dashboard={dashboard} profile={profile} />
 
       {/* 2. Quick Stats Row */}
       <QuickStats dashboard={dashboard} />

@@ -48,7 +48,13 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PersistQueryClientProvider
       client={queryClient}
-      persistOptions={{ persister }}
+      persistOptions={{
+        persister,
+        buster: 'beatly-no-user-query-cache-v1',
+        dehydrateOptions: {
+          shouldDehydrateQuery: () => false
+        }
+      }}
       onSuccess={() => {
         queryClient.resumePausedMutations().then(() => {
           queryClient.invalidateQueries({ refetchType: 'active' });

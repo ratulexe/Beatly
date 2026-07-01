@@ -7,6 +7,7 @@ import ProtectedRoute from './ProtectedRoute';
 // Eager load core routes
 import Home from '../pages/Home/Home';
 import Login from '../pages/Login/Login';
+import Devices from '../pages/Settings/Devices/Devices';
 
 // Lazy load feature routes
 const Dashboard = lazy(() => import('../pages/Dashboard/Dashboard'));
@@ -42,7 +43,6 @@ const DiscoverDashboard = lazy(() => import('../pages/Discover/DiscoverDashboard
 const WrappedDashboard = lazy(() => import('../pages/Wrapped/WrappedDashboard'));
 
 // Phase 17 Pages
-const Devices = lazy(() => import('../pages/Settings/Devices/Devices'));
 const DeviceDetails = lazy(() => import('../pages/Settings/Devices/DeviceDetails'));
 
 const PageLoader = () => (

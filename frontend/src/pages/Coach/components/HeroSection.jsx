@@ -3,10 +3,11 @@ import { motion } from 'framer-motion';
 import { Bot, ArrowRight, Flame, Trophy, Coins, Target } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-const HeroSection = ({ dashboard }) => {
+const HeroSection = ({ dashboard, profile }) => {
   const { streak, goals, habits } = dashboard || {};
   const todayGoal = goals?.find(g => g.frequency === 'Daily');
   const coachScore = 82; // Simulated based on logic later
+  const displayName = profile?.displayName || profile?.name || 'there';
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -53,7 +54,7 @@ const HeroSection = ({ dashboard }) => {
             <div className="flex items-center gap-2 text-beatly-primary font-bold text-sm uppercase tracking-widest">
               <Bot size={16} /> Beatly Coach
             </div>
-            <h1 className="text-4xl font-bold text-white tracking-tight">{getGreeting()}, Ratul</h1>
+            <h1 className="text-4xl font-bold text-white tracking-tight">{getGreeting()}, {displayName}</h1>
             <div className="flex items-center gap-3 pt-2">
               <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/5 flex items-center gap-2">
                 <span className="text-gray-400 text-sm">Coach Score</span>
