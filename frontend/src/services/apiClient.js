@@ -2,9 +2,18 @@ import axios from 'axios';
 import { get, set } from 'idb-keyval';
 
 const OFFLINE_QUEUE_KEY = 'beatly_offline_mutations';
+const electronConfig = typeof window !== 'undefined' ? window.electronAPI?.config : undefined;
+export const API_BASE_URL = electronConfig?.apiBaseUrl ||
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  'http://127.0.0.1:5000';
+
+export const SOCKET_BASE_URL = electronConfig?.socketUrl ||
+  import.meta.env.VITE_SOCKET_URL ||
+  API_BASE_URL;
 
 export const api = axios.create({
-  baseURL: 'http://127.0.0.1:5000', // Absolute URL required for Electron file:// execution
+  baseURL: API_BASE_URL, // Absolute URL required for Electron file:// execution
   withCredentials: true // Extremely important to send the connect.sid session cookie
 });
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { api, flushOfflineMutations, getPendingMutationCount } from '../services/apiClient';
+import { api, flushOfflineMutations, getPendingMutationCount, SOCKET_BASE_URL } from '../services/apiClient';
 
 const SyncContext = createContext();
 
@@ -66,7 +66,7 @@ export const SyncProvider = ({ children }) => {
       const { io } = await import('socket.io-client');
       if (!isActive) return;
 
-      socket = io(api.defaults.baseURL || 'http://127.0.0.1:5000', {
+      socket = io(SOCKET_BASE_URL, {
         path: '/socket.io',
         withCredentials: true
       });

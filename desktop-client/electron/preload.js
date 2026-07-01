@@ -4,6 +4,10 @@ const safeString = (value, maxLength) => String(value || '').slice(0, maxLength)
 const allowedEvents = new Set(['sync-event', 'updater-event', 'force-sync']);
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  config: Object.freeze({
+    apiBaseUrl: safeString(process.env.BEATLY_API_BASE_URL, 240),
+    socketUrl: safeString(process.env.BEATLY_SOCKET_URL, 240),
+  }),
   getAppVersion: () => ipcRenderer.invoke('get-app-version'),
   showNotification: (title, body) => ipcRenderer.invoke('show-notification', {
     title: safeString(title || 'Beatly', 80),

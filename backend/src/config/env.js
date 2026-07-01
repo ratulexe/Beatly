@@ -20,6 +20,7 @@ export const env = {
   MONGODB_URI: process.env.MONGODB_URI || 'mongodb://localhost:27017/beatly',
   SESSION_SECRET: process.env.SESSION_SECRET || 'fallback_secret',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:5173',
+  CACHE_DRIVER: process.env.CACHE_DRIVER || 'memory',
   
   // AI Configuration
   AI_PROVIDER: process.env.AI_PROVIDER || 'ollama',

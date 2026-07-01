@@ -18,6 +18,8 @@ Optional development environment variables:
 $env:NODE_ENV = "development"
 $env:BEATLY_ELECTRON_DEV_URL = "http://127.0.0.1:5173"
 $env:BEATLY_ELECTRON_OPEN_DEVTOOLS = "true"
+$env:BEATLY_API_BASE_URL = "http://127.0.0.1:5000"
+$env:BEATLY_SOCKET_URL = "http://127.0.0.1:5000"
 ```
 
 DevTools are opt-in. Do not enable `BEATLY_ELECTRON_OPEN_DEVTOOLS` for production release verification.
@@ -79,7 +81,11 @@ CLIENT_URL=http://localhost:5173
 Electron:
 
 ```text
+BEATLY_API_BASE_URL=http://127.0.0.1:5000
+BEATLY_SOCKET_URL=http://127.0.0.1:5000
 BEATLY_ENABLE_AUTO_UPDATE=true   # only after real publish config is added
+BEATLY_ELECTRON_OPEN_DEVTOOLS=false
+BEATLY_ELECTRON_DEV_URL=http://127.0.0.1:5173
 ```
 
 Do not bundle secrets into Electron. Spotify, database, and session secrets belong to the backend environment only.

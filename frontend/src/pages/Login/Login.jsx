@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../../components/layout/PageContainer';
 import { Button } from '../../components/ui/Button';
+import { API_BASE_URL } from '../../services/apiClient';
 
 export default function Login() {
   const [searchParams] = useSearchParams();
@@ -19,7 +20,7 @@ export default function Login() {
 
   const handleLogin = () => {
     setLoading(true);
-    window.location.href = `http://127.0.0.1:5000/api/auth/login?t=${Date.now()}`;
+    window.location.href = `${API_BASE_URL.replace(/\/$/, '')}/api/auth/login?t=${Date.now()}`;
   };
 
   return (
