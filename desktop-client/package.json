@@ -5,7 +5,9 @@
   "main": "electron/main.js",
   "scripts": {
     "start": ".\\node_modules\\electron\\dist\\electron.exe .",
-    "build": "electron-builder"
+    "build": "electron-builder --win nsis",
+    "build:unpacked": "electron-builder --dir",
+    "build:installer": "electron-builder --win nsis"
   },
   "keywords": [],
   "author": "Beatly",
@@ -14,13 +16,21 @@
   "build": {
     "appId": "com.beatly.desktop",
     "productName": "Beatly",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "asar": true,
+    "beforeBuild": "electron/before-build.js",
+    "compression": "maximum",
     "directories": {
       "output": "dist"
     },
     "electronDist": "node_modules/electron/dist",
     "files": [
       "electron/**/*",
-      "package.json"
+      "package.json",
+      "!**/*.map",
+      "!**/*.log",
+      "!**/node_modules/.cache/**",
+      "!dist/**"
     ],
     "extraResources": [
       {
@@ -34,13 +44,17 @@
     "win": {
       "target": "nsis",
       "icon": "electron/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "deleteAppDataOnUninstall": false
     }
   },
   "devDependencies": {
     "electron": "^42.5.1",
-    "electron-builder": "^26.15.3"
-  },
-  "dependencies": {
+    "electron-builder": "^26.15.3",
     "electron-updater": "^6.8.9"
   }
 }

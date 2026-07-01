@@ -1,10 +1,40 @@
-const { app, BrowserWindow, ipcMain, Notification } = require('electron');
+const { app, BrowserWindow, ipcMain, Notification, shell } = require('electron');
 const path = require('path');
 const { setupUpdater } = require('./updater');
 const { setupTray } = require('./tray');
 
 let mainWindow;
 let tray;
+const FRONTEND_DEV_URL = process.env.BEATLY_ELECTRON_DEV_URL || 'http://127.0.0.1:5173';
+const FRONTEND_DEV_ORIGINS = new Set(['http://localhost:5173', 'http://127.0.0.1:5173']);
+const APP_ID = 'com.beatly.desktop';
+
+function getFrontendIndexPath() {
+  return app.isPackaged
+    ? path.join(process.resourcesPath, 'frontend/dist/index.html')
+    : path.join(__dirname, '../../frontend/dist/index.html');
+}
+
+function loadProductionRoute(routePath = '/') {
+  const safeRoute = routePath.startsWith('/') ? routePath : '/';
+  return mainWindow.loadFile(getFrontendIndexPath()).then(() => {
+    if (safeRoute !== '/') {
+      return mainWindow.webContents.executeJavaScript(
+        `window.location.hash = ${JSON.stringify(safeRoute)};`,
+        true
+      );
+    }
+    return null;
+  });
+}
+
+function isFrontendDevUrl(url) {
+  try {
+    return FRONTEND_DEV_ORIGINS.has(new URL(url).origin);
+  } catch {
+    return false;
+  }
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -24,11 +54,29 @@ function createWindow() {
   const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
   if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-    mainWindow.webContents.openDevTools();
+    mainWindow.loadURL(FRONTEND_DEV_URL);
+    if (process.env.BEATLY_ELECTRON_OPEN_DEVTOOLS === 'true') {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    }
   } else {
-    mainWindow.loadFile(path.join(process.resourcesPath, 'frontend/dist/index.html'));
+    loadProductionRoute();
   }
+
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    if (url.startsWith('https://open.spotify.com/')) {
+      shell.openExternal(url);
+    }
+    return { action: 'deny' };
+  });
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!app.isPackaged || !isFrontendDevUrl(url)) return;
+    event.preventDefault();
+    const routePath = new URL(url).pathname || '/';
+    loadProductionRoute(routePath).catch((error) => {
+      console.error('Failed to load packaged route after OAuth redirect:', error);
+    });
+  });
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
@@ -40,6 +88,7 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  app.setAppUserModelId(APP_ID);
   createWindow();
   tray = setupTray(mainWindow);
   setupUpdater(mainWindow);
@@ -63,8 +112,8 @@ ipcMain.handle('show-notification', (_event, { title, body }) => {
   if (!Notification.isSupported()) return false;
 
   new Notification({
-    title: String(title || 'Beatly'),
-    body: String(body || '')
+    title: String(title || 'Beatly').slice(0, 80),
+    body: String(body || '').slice(0, 240)
   }).show();
 
   return true;
