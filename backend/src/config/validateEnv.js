@@ -5,6 +5,7 @@ export const validateEnv = () => {
     'SPOTIFY_CLIENT_SECRET',
     'SESSION_SECRET',
     'FRONTEND_URL',
+    'CORS_ORIGIN',
     'NODE_ENV',
     'CACHE_DRIVER'
   ];

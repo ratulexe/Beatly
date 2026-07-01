@@ -39,6 +39,7 @@ jobs:
         CACHE_DRIVER: memory
         SESSION_SECRET: ci-test-session-secret
         FRONTEND_URL: http://localhost:5173
+        CORS_ORIGIN: http://localhost:5173
         SPOTIFY_CLIENT_ID: ci-test-client-id
         SPOTIFY_CLIENT_SECRET: ci-test-client-secret
 

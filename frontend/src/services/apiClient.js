@@ -104,7 +104,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Add a response interceptor to unwrap data
 api.interceptors.response.use(
   (response) => response.data,
   async (error) => {
@@ -114,7 +113,3 @@ api.interceptors.response.use(
     return Promise.reject(error.response?.data || error.message);
   }
 );
-
-// Since the pages are doing `api.get('/api/leaderboards...')`, the baseURL is just the domain, OR
-// I can just set baseURL to 'http://127.0.0.1:5000' because I called `api.get('/api/leaderboards...')` in the components.
-// Or wait, in the components I did: `api.get('/api/leaderboards/global')`. If baseURL is `http://127.0.0.1:5000`, that works.

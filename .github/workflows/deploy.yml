@@ -1,4 +1,4 @@
-name: Deploy
+name: Deployment Placeholder
 
 on:
   push:
@@ -13,9 +13,7 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
-    - name: Simulate Deployment
+    - name: Confirm Manual Deployment Required
       run: |
-        echo "Simulating deployment process..."
-        echo "Docker images would be built and pushed here."
-        echo "Deployment to production server triggered!"
-        echo "✅ Deployment completed successfully!"
+        echo "No production deployment is configured yet."
+        echo "Choose backend/frontend platforms and add provider-specific deployment steps before enabling automatic deploys."

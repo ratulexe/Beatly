@@ -31,9 +31,10 @@ MONGODB_URI=mongodb+srv://...
 SESSION_SECRET=<strong secret>
 FRONTEND_URL=https://app.example.com
 CLIENT_URL=https://app.example.com
+CORS_ORIGIN=https://app.example.com
 SPOTIFY_CLIENT_ID=<from Spotify dashboard>
 SPOTIFY_CLIENT_SECRET=<from Spotify dashboard>
-SPOTIFY_REDIRECT_URI=https://api.example.com/api/auth/callback
+SPOTIFY_REDIRECT_URI=https://api.example.com/api/auth/spotify/callback
 CACHE_DRIVER=memory
 AI_PROVIDER=ollama
 OLLAMA_BASE_URL=http://localhost:11434
@@ -44,7 +45,7 @@ OLLAMA_MODEL=qwen2.5:3b
 
 ## CORS And Cookies
 
-Set `FRONTEND_URL` and `CLIENT_URL` to the deployed frontend origin. The backend also allows local dev origins and Electron `null` origin for packaged desktop support.
+Set `FRONTEND_URL`, `CLIENT_URL`, and `CORS_ORIGIN` to the deployed frontend origin. `CORS_ORIGIN` also accepts a comma-separated allowlist if a private beta needs more than one frontend origin. The backend allows Electron's `null` origin for packaged desktop support.
 
 In production, Express session cookies use `secure: true`, `httpOnly: true`, and `sameSite: lax`.
 
@@ -57,13 +58,13 @@ MongoDB is required. Mongoose creates declared indexes at runtime. No demo data 
 Configure the Spotify developer dashboard with the exact production redirect URI:
 
 ```text
-https://api.example.com/api/auth/callback
+https://api.example.com/api/auth/spotify/callback
 ```
 
 For local development:
 
 ```text
-http://localhost:5000/api/auth/callback
+http://localhost:5000/api/auth/spotify/callback
 ```
 
 ## Electron

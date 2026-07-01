@@ -13,7 +13,7 @@
 
 - [ ] Production MongoDB URI configured.
 - [ ] Strong production `SESSION_SECRET` configured.
-- [ ] `FRONTEND_URL` and `CLIENT_URL` set to deployed frontend.
+- [ ] `FRONTEND_URL`, `CLIENT_URL`, and `CORS_ORIGIN` set to deployed frontend.
 - [ ] Spotify production redirect URI added to Spotify dashboard.
 - [ ] Backend health route verified after deploy.
 - [ ] Protected API returns 401/403 when unauthenticated.

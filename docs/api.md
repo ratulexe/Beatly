@@ -12,6 +12,7 @@ The backend is an Express API. Most product routes require an authenticated Spot
 
 - `GET /api/auth/login`: starts Spotify OAuth.
 - `GET /api/auth/callback`: handles Spotify OAuth callback.
+- `GET /api/auth/spotify/callback`: production Spotify OAuth callback alias.
 - `POST /api/auth/logout`: destroys current session.
 - `GET /api/auth/status`: returns current session authentication status.
 

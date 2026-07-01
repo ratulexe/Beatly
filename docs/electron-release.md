@@ -34,7 +34,7 @@ npm run build
 
 The Electron package includes `../frontend/dist` as an extra resource and loads it from `process.resourcesPath` in packaged mode.
 
-The packaged app expects the Beatly backend API to be reachable at `http://127.0.0.1:5000` unless the frontend API client is changed for a hosted backend release. The backend CORS configuration intentionally allows Electron's `null` origin for packaged `file://` loading.
+The packaged app reads `BEATLY_API_BASE_URL` and `BEATLY_SOCKET_URL` through the preload bridge. Local builds can use `http://127.0.0.1:5000`; hosted beta/release builds must set both variables to the deployed backend origin. The backend CORS configuration intentionally allows Electron's `null` origin for packaged `file://` loading.
 
 ## Build Commands
 
@@ -73,9 +73,10 @@ MONGODB_URI
 SESSION_SECRET
 SPOTIFY_CLIENT_ID
 SPOTIFY_CLIENT_SECRET
-SPOTIFY_REDIRECT_URI=http://localhost:5000/api/auth/callback
+SPOTIFY_REDIRECT_URI=http://localhost:5000/api/auth/spotify/callback
 FRONTEND_URL=http://localhost:5173
 CLIENT_URL=http://localhost:5173
+CORS_ORIGIN=http://localhost:5173
 ```
 
 Electron:
@@ -104,7 +105,7 @@ Auto-update publishing is intentionally not configured with a fake provider. Bef
 
 ## Known Limitations
 
-- The packaged app currently assumes a reachable Beatly backend at `http://127.0.0.1:5000`.
+- Non-local packaged builds require `BEATLY_API_BASE_URL` and `BEATLY_SOCKET_URL` to point at the deployed backend.
 - OAuth redirects that return to the browser dev origin are bridged back into the packaged frontend by the Electron main process.
 - Full two-device Socket.IO behavior should still be smoke-tested manually before public release.
 - Unsigned Windows installers can trigger SmartScreen warnings.
