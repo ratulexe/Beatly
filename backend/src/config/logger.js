@@ -82,20 +82,19 @@ logger.audit = winston.createLogger({
   transports: [createRotateTransport('audit')]
 });
 
-// If we're not in production, log to the console as well with pretty colors
-if (process.env.NODE_ENV !== 'production') {
-  const consoleFormat = winston.format.combine(
-    winston.format.colorize(),
-    winston.format.printf(({ level, message, timestamp, stack }) => {
-      return `${timestamp} ${level}: ${message} ${stack ? `\n${stack}` : ''}`;
-    })
-  );
+const consoleFormat = process.env.NODE_ENV === 'production'
+  ? logFormat
+  : winston.format.combine(
+      winston.format.colorize(),
+      winston.format.printf(({ level, message, timestamp, stack }) => {
+        return `${timestamp} ${level}: ${message} ${stack ? `\n${stack}` : ''}`;
+      })
+    );
 
-  logger.add(new winston.transports.Console({ format: consoleFormat }));
-  logger.auth.add(new winston.transports.Console({ format: consoleFormat }));
-  logger.spotify.add(new winston.transports.Console({ format: consoleFormat }));
-  logger.cron.add(new winston.transports.Console({ format: consoleFormat }));
-  logger.audit.add(new winston.transports.Console({ format: consoleFormat }));
-}
+logger.add(new winston.transports.Console({ format: consoleFormat }));
+logger.auth.add(new winston.transports.Console({ format: consoleFormat }));
+logger.spotify.add(new winston.transports.Console({ format: consoleFormat }));
+logger.cron.add(new winston.transports.Console({ format: consoleFormat }));
+logger.audit.add(new winston.transports.Console({ format: consoleFormat }));
 
 export default logger;
