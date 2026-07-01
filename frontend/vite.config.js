@@ -39,9 +39,11 @@ export default defineConfig({
         ]
       },
       workbox: {
-        // Cache ONLY static assets (html, css, js, images).
+        // Cache only versioned static assets. Do not precache HTML; Vercel should serve
+        // the latest app shell so account switches and hotfixes do not show stale UI.
         // Exclude all API routes and dynamically fetched data.
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,css,ico,png,svg}'],
+        cleanupOutdatedCaches: true,
         navigateFallbackDenylist: [/^\/api/],
         runtimeCaching: []
       }
